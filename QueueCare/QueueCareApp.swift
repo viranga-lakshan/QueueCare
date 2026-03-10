@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct QueueCareApp: App {
+    @StateObject private var controller = QueueController()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(controller: controller)
         }
     }
 }
