@@ -54,9 +54,7 @@ struct VerificationSuccessView: View {
                             .multilineTextAlignment(.center)
                     }
 
-                    Button(action: {
-                        // Navigate to main app - will be implemented next
-                    }) {
+                    Button(action: controller.showDashboard) {
                         Text("Let's Explore")
                             .font(.headline)
                             .foregroundStyle(.white)

@@ -8,17 +8,27 @@ final class QueueController: ObservableObject {
         case registration
         case verification
         case verificationSuccess
+        case dashboard
+        case departmentSelection
+        case laboratoryRequest
+        case laboratoryVisitSelection
+        case pharmacyStatus
     }
 
     @Published private(set) var currentScreen: Screen = .welcome
     @Published private(set) var patients: [QueuePatient] = []
     @Published private(set) var waitingCount = 0
     @Published private(set) var activeCount = 0
+    @Published private(set) var selectedDashboardTab: DashboardTab = .home
+    @Published private(set) var selectedChildName = ""
 
     private var model = QueueModel()
+    let laboratoryController = LaboratoryController()
+    let pharmacyController = PharmacyController()
 
     init() {
         syncFromModel()
+        selectedChildName = model.dashboard.children.first ?? ""
     }
 
     var onboardingFeatures: [OnboardingFeature] {
@@ -41,6 +51,18 @@ final class QueueController: ObservableObject {
         ]
     }
 
+    var dashboard: DashboardModel {
+        model.dashboard
+    }
+
+    var availableChildren: [String] {
+        model.dashboard.children
+    }
+
+    var departmentOptions: [DepartmentOption] {
+        model.departmentCatalog.options
+    }
+
     func showWelcome() {
         currentScreen = .welcome
     }
@@ -55,6 +77,61 @@ final class QueueController: ObservableObject {
 
     func showVerificationSuccess() {
         currentScreen = .verificationSuccess
+    }
+
+    func showDashboard() {
+        if selectedChildName.isEmpty {
+            selectedChildName = availableChildren.first ?? ""
+        }
+
+        selectedDashboardTab = .home
+        currentScreen = .dashboard
+    }
+
+    func showDepartmentSelection() {
+        selectedDashboardTab = .home
+        currentScreen = .departmentSelection
+    }
+
+    func showLaboratoryRequest() {
+        selectedDashboardTab = .home
+        laboratoryController.loadMockRequest()
+        currentScreen = .laboratoryRequest
+    }
+
+    func showLaboratoryVisitSelection() {
+        selectedDashboardTab = .home
+        laboratoryController.loadMockVisitSelection()
+        currentScreen = .laboratoryVisitSelection
+    }
+
+    func showPharmacyStatus() {
+        selectedDashboardTab = .home
+        pharmacyController.loadMockStatus()
+        currentScreen = .pharmacyStatus
+    }
+
+    func selectDashboardTab(_ tab: DashboardTab) {
+        selectedDashboardTab = tab
+        currentScreen = .dashboard
+    }
+
+    func handleDashboardShortcut(_ shortcut: DashboardShortcut) {
+        switch shortcut.action {
+        case .departmentSelection:
+            showDepartmentSelection()
+        case .laboratoryRequest:
+            showLaboratoryRequest()
+        case .pharmacyStatus:
+            showPharmacyStatus()
+        case let .tab(tab):
+            selectDashboardTab(tab)
+        }
+    }
+
+    func selectChild(named name: String) {
+        guard availableChildren.contains(name) else { return }
+        selectedChildName = name
     }
 
     func addPatient(name: String) {

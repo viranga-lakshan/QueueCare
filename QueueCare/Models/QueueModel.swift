@@ -22,6 +22,8 @@ struct QueuePatient: Identifiable, Equatable {
 
 struct QueueModel {
     private(set) var patients: [QueuePatient] = []
+    private(set) var dashboard = DashboardModel.sample
+    private(set) var departmentCatalog = DepartmentCatalog.sample
 
     mutating func addPatient(named name: String) {
         let cleanedName = name.trimmingCharacters(in: .whitespacesAndNewlines)

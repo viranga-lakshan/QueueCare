@@ -9,6 +9,7 @@ import SwiftUI
 
 @main
 struct QueueCareApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var controller = QueueController()
 
     var body: some Scene {
