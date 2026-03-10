@@ -23,6 +23,7 @@ final class QueueController: ObservableObject {
     @Published private(set) var selectedChildName = ""
 
     private var model = QueueModel()
+    let phoneAuthController = PhoneAuthController()
     let laboratoryController = LaboratoryController()
     let pharmacyController = PharmacyController()
 
@@ -64,19 +65,36 @@ final class QueueController: ObservableObject {
     }
 
     func showWelcome() {
+        phoneAuthController.clearError()
         currentScreen = .welcome
     }
 
     func showRegistration() {
+        phoneAuthController.clearError()
         currentScreen = .registration
     }
 
     func showVerification() {
+        phoneAuthController.clearError()
         currentScreen = .verification
     }
 
     func showVerificationSuccess() {
         currentScreen = .verificationSuccess
+    }
+
+    func requestOTP(for phoneNumber: String) async {
+        let didSendCode = await phoneAuthController.sendOTP(to: phoneNumber)
+        if didSendCode {
+            showVerification()
+        }
+    }
+
+    func verifyOTP(_ code: String) async {
+        let didVerifyCode = await phoneAuthController.verifyOTP(code)
+        if didVerifyCode {
+            showVerificationSuccess()
+        }
     }
 
     func showDashboard() {

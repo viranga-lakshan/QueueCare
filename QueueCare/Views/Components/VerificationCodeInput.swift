@@ -4,6 +4,7 @@ struct VerificationCodeInput: View {
     @Binding var code: String
     @FocusState.Binding var focusedIndex: Int?
     let index: Int
+    let totalDigits: Int
     let brandColor: Color
 
     var body: some View {
@@ -34,7 +35,7 @@ struct VerificationCodeInput: View {
                 }
                 
                 if code.count > index {
-                    focusedIndex = min(index + 1, 4)
+                    focusedIndex = index + 1 < totalDigits ? index + 1 : nil
                 }
             }
         ))
@@ -63,6 +64,7 @@ struct VerificationCodeInput: View {
                 code: $code,
                 focusedIndex: $focusedIndex,
                 index: index,
+                totalDigits: 6,
                 brandColor: Color(red: 7 / 255, green: 169 / 255, blue: 150 / 255)
             )
         }

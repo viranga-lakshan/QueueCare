@@ -9,11 +9,11 @@ struct ContentView: View {
             case .welcome:
                 WelcomeView(controller: controller)
             case .registration:
-                PatientRegistrationView(controller: controller)
+                PatientRegistrationView(controller: controller, phoneAuthController: controller.phoneAuthController)
             case .verification:
-                VerificationView(controller: controller)
+                VerificationView(controller: controller, phoneAuthController: controller.phoneAuthController)
             case .verificationSuccess:
-                VerificationSuccessView(controller: controller)
+                VerificationSuccessView(controller: controller, phoneAuthController: controller.phoneAuthController)
             case .dashboard:
                 DashboardView(controller: controller)
             case .departmentSelection:

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct VerificationView: View {
     @ObservedObject var controller: QueueController
+    @ObservedObject var phoneAuthController: PhoneAuthController
     @State private var code = ""
     @FocusState private var focusedIndex: Int?
 
@@ -23,38 +24,61 @@ struct VerificationView: View {
                         .foregroundStyle(Color(red: 0.18, green: 0.18, blue: 0.2))
                         .padding(.top, 32)
 
-                    Text("Enter your verification code")
+                    Text(verificationSubtitle)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 28)
                 }
                 .frame(maxWidth: .infinity)
 
                 HStack(spacing: 12) {
-                    ForEach(0..<5) { index in
+                    ForEach(0..<phoneAuthController.otpDigits, id: \.self) { index in
                         VerificationCodeInput(
                             code: $code,
                             focusedIndex: $focusedIndex,
                             index: index,
+                            totalDigits: phoneAuthController.otpDigits,
                             brandColor: brandColor
                         )
                     }
                 }
                 .padding(.top, 48)
 
+                if let errorMessage = phoneAuthController.errorMessage {
+                    Text(errorMessage)
+                        .font(.footnote.weight(.medium))
+                        .foregroundStyle(.red)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 28)
+                        .padding(.top, 18)
+                }
+
                 Spacer()
 
-                Button(action: controller.showVerificationSuccess) {
-                    Text("Verify")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(
-                            Capsule(style: .continuous)
-                                .fill(brandColor.opacity(canVerify ? 1 : 0.45))
-                        )
+                Button {
+                    Task {
+                        await controller.verifyOTP(code)
+                    }
+                } label: {
+                    Group {
+                        if phoneAuthController.isVerifyingCode {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Text("Verify")
+                                .font(.headline)
+                        }
+                    }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(brandColor.opacity(canVerify ? 1 : 0.45))
+                    )
                 }
-                .disabled(!canVerify)
+                .disabled(!canVerify || phoneAuthController.isVerifyingCode)
                 .padding(.horizontal, 42)
                 .padding(.bottom, 28)
 
@@ -64,12 +88,24 @@ struct VerificationView: View {
             RegistrationWaveFooter(color: brandColor)
         }
         .onAppear {
+            code = ""
             focusedIndex = 0
+        }
+        .onChange(of: code) { _, _ in
+            phoneAuthController.clearError()
         }
     }
 
     private var canVerify: Bool {
-        code.count == 5
+        code.filter(\.isNumber).count == phoneAuthController.otpDigits
+    }
+
+    private var verificationSubtitle: String {
+        if phoneAuthController.currentPhoneNumber.isEmpty {
+            return "Enter your verification code"
+        }
+
+        return "Enter the 6-digit code sent to\n\(phoneAuthController.maskedPhoneNumber)"
     }
 
     private var topBar: some View {
@@ -91,5 +127,5 @@ struct VerificationView: View {
 }
 
 #Preview {
-    VerificationView(controller: QueueController())
+    VerificationView(controller: QueueController(), phoneAuthController: PhoneAuthController())
 }

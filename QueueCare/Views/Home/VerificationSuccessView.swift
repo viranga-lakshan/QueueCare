@@ -2,6 +2,7 @@ import SwiftUI
 
 struct VerificationSuccessView: View {
     @ObservedObject var controller: QueueController
+    @ObservedObject var phoneAuthController: PhoneAuthController
     private let brandColor = Color(red: 7 / 255, green: 169 / 255, blue: 150 / 255)
     private let backgroundColor = Color(red: 0.94, green: 0.97, blue: 0.97)
 
@@ -20,15 +21,16 @@ struct VerificationSuccessView: View {
                         .foregroundStyle(Color.gray.opacity(0.4))
                         .padding(.top, 32)
 
-                    Text("Enter your verification code")
+                    Text(phoneAuthController.currentPhoneNumber.isEmpty ? "Phone verified successfully" : "Code confirmed for\n\(phoneAuthController.maskedPhoneNumber)")
                         .font(.subheadline)
                         .foregroundStyle(Color.secondary.opacity(0.5))
+                        .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: .infinity)
 
                 HStack(spacing: 12) {
-                    ForEach(0..<5) { _ in
-                        Text("2")
+                    ForEach(0..<phoneAuthController.otpDigits, id: \.self) { index in
+                        Text(verifiedDigit(at: index))
                             .font(.system(size: 28, weight: .bold, design: .rounded))
                             .frame(width: 54, height: 54)
                             .background(Color.white.opacity(0.5))
@@ -48,7 +50,7 @@ struct VerificationSuccessView: View {
                             .font(.system(size: 22, weight: .bold, design: .rounded))
                             .foregroundStyle(.black)
 
-                        Text("Your phone number has been\nsuccessfully verified")
+                        Text(successMessage)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
@@ -137,6 +139,21 @@ struct VerificationSuccessView: View {
         }
         .ignoresSafeArea(edges: .bottom)
     }
+
+    private var successMessage: String {
+        if phoneAuthController.currentPhoneNumber.isEmpty {
+            return "Your phone number has been\nsuccessfully verified"
+        }
+
+        return "\(phoneAuthController.maskedPhoneNumber) has been\nsuccessfully verified"
+    }
+
+    private func verifiedDigit(at index: Int) -> String {
+        guard phoneAuthController.lastVerifiedCode.count > index else { return "•" }
+        let startIndex = phoneAuthController.lastVerifiedCode.index(phoneAuthController.lastVerifiedCode.startIndex, offsetBy: index)
+        let endIndex = phoneAuthController.lastVerifiedCode.index(after: startIndex)
+        return String(phoneAuthController.lastVerifiedCode[startIndex..<endIndex])
+    }
 }
 
 private struct WaveShape: Shape {
@@ -171,5 +188,5 @@ private struct WaveShape: Shape {
 }
 
 #Preview {
-    VerificationSuccessView(controller: QueueController())
+    VerificationSuccessView(controller: QueueController(), phoneAuthController: PhoneAuthController())
 }

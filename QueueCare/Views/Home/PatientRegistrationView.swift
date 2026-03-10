@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PatientRegistrationView: View {
     @ObservedObject var controller: QueueController
+    @ObservedObject var phoneAuthController: PhoneAuthController
     @State private var phoneNumber = ""
     @State private var acceptedTerms = false
 
@@ -46,7 +47,7 @@ struct PatientRegistrationView: View {
                                 .font(.system(size: 16, weight: .medium))
                                 .frame(width: 18)
 
-                            TextField("Number", text: $phoneNumber)
+                            TextField("+94771234567", text: $phoneNumber)
                                 .keyboardType(.phonePad)
                                 .textInputAutocapitalization(.never)
                         }
@@ -56,6 +57,16 @@ struct PatientRegistrationView: View {
                                 .fill(brandColor.opacity(0.35))
                                 .frame(height: 1.5)
                         }
+                    }
+
+                    Text("Use +94771234567 or 0771234567")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    if let errorMessage = phoneAuthController.errorMessage {
+                        Text(errorMessage)
+                            .font(.footnote.weight(.medium))
+                            .foregroundStyle(.red)
                     }
 
                     Spacer(minLength: 0)
@@ -72,18 +83,29 @@ struct PatientRegistrationView: View {
                     .toggleStyle(CheckboxToggleStyle(tint: brandColor))
                     .padding(.bottom, 20)
 
-                    Button(action: controller.showVerification) {
-                        Text("Register")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(
-                                Capsule(style: .continuous)
-                                    .fill(brandColor.opacity(canRegister ? 1 : 0.45))
-                            )
+                    Button {
+                        Task {
+                            await controller.requestOTP(for: phoneNumber)
+                        }
+                    } label: {
+                        Group {
+                            if phoneAuthController.isSendingCode {
+                                ProgressView()
+                                    .tint(.white)
+                            } else {
+                                Text("Register")
+                                    .font(.headline)
+                            }
+                        }
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(brandColor.opacity(canRegister ? 1 : 0.45))
+                        )
                     }
-                    .disabled(!canRegister)
+                    .disabled(!canRegister || phoneAuthController.isSendingCode)
                     .padding(.horizontal, 42)
                 }
                 .padding(.top, 50)
@@ -93,6 +115,9 @@ struct PatientRegistrationView: View {
             }
 
             RegistrationWaveFooter(color: brandColor)
+        }
+        .onChange(of: phoneNumber) { _, _ in
+            phoneAuthController.clearError()
         }
     }
 
@@ -153,5 +178,5 @@ private struct CheckboxToggleStyle: ToggleStyle {
 }
 
 #Preview {
-    PatientRegistrationView(controller: QueueController())
+    PatientRegistrationView(controller: QueueController(), phoneAuthController: PhoneAuthController())
 }
