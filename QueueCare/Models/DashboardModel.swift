@@ -108,12 +108,11 @@ enum DashboardAccentTheme {
 enum DashboardTab: String, CaseIterable, Identifiable {
     case home
     case queue
-    case map
     case progress
     case user
 
     var id: String { rawValue }
-    static let visibleTabs: [DashboardTab] = [.home, .queue, .map, .progress, .user]
+    static let visibleTabs: [DashboardTab] = [.home, .queue, .progress, .user]
 
     var title: String {
         switch self {
@@ -121,8 +120,6 @@ enum DashboardTab: String, CaseIterable, Identifiable {
             return "Home"
         case .queue:
             return "Queue"
-        case .map:
-            return "Map"
         case .progress:
             return "Progress"
         case .user:
@@ -136,8 +133,6 @@ enum DashboardTab: String, CaseIterable, Identifiable {
             return "home"
         case .queue:
             return "Queue"
-        case .map:
-            return "map"
         case .progress:
             return "progress"
         case .user:
@@ -151,8 +146,6 @@ enum DashboardTab: String, CaseIterable, Identifiable {
             return "house.fill"
         case .queue:
             return "cross.case.fill"
-        case .map:
-            return "map.fill"
         case .progress:
             return "scope"
         case .user:

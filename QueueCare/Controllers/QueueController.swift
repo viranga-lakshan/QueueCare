@@ -28,6 +28,8 @@ final class QueueController: ObservableObject {
         case payment
         case selectPatient
         case profileSetup
+        case liveQueue
+        case departmentProgress
     }
 
     @Published private(set) var currentScreen: Screen = .welcome
@@ -45,6 +47,10 @@ final class QueueController: ObservableObject {
     @Published private(set) var hasActiveQueue = false
     @Published private(set) var selectablePatients: [SelectablePatient] = []
     @Published private(set) var userProfile: UserProfile = .empty
+    @Published private(set) var liveQueue: LiveQueueModel = .mock(for: "")
+    @Published private(set) var bookDoctorProgress: BookDoctorProgress? = nil
+    @Published private(set) var labProgress: LabProgress? = nil
+    @Published private(set) var pharmacyProgressEntry: PharmacyProgressEntry? = nil
 
     private var model = QueueModel()
     let phoneAuthController = PhoneAuthController()
@@ -118,6 +124,24 @@ final class QueueController: ObservableObject {
         showDashboard()
     }
 
+    func showLiveQueue() {
+        liveQueue = .mock(for: bookAppointment.departmentName)
+        // Record Book Doctor progress as In Queue
+        let option = departmentOptions.first { $0.title == bookAppointment.departmentName }
+        bookDoctorProgress = BookDoctorProgress(
+            departmentName: bookAppointment.departmentName,
+            imageName: option?.imageName ?? "generalOPD",
+            theme: option?.theme ?? .blue,
+            status: .inQueue(
+                token: liveQueue.queueNumber,
+                currentServing: liveQueue.currentServing,
+                peopleAhead: liveQueue.peopleAhead,
+                estimatedWaitMin: liveQueue.estimatedWaitMin
+            )
+        )
+        currentScreen = .liveQueue
+    }
+
     func requestOTP(for phoneNumber: String) async {
         let didSendCode = await phoneAuthController.sendOTP(to: phoneNumber)
         if didSendCode {
@@ -173,12 +197,31 @@ final class QueueController: ObservableObject {
     func showLaboratoryConfirmation() {
         selectedDashboardTab = .home
         laboratoryController.loadMockConfirmation()
+        // Record Lab progress as Scheduled
+        let conf = laboratoryController.confirmation
+        labProgress = LabProgress(
+            status: .scheduled(dateLabel: conf.formattedDate, timeLabel: conf.confirmedTime),
+            dateLabel: conf.formattedDate,
+            timeLabel: conf.confirmedTime
+        )
         currentScreen = .laboratoryConfirmation
     }
 
     func showLaboratoryInpatientStatus() {
         selectedDashboardTab = .home
         laboratoryController.loadMockInpatientStatus()
+        // Record Lab progress as In Queue
+        let conf = laboratoryController.confirmation
+        labProgress = LabProgress(
+            status: .inQueue(
+                token: "L - 12",
+                currentServing: "L - 08",
+                peopleAhead: 4,
+                estimatedWaitMin: 15
+            ),
+            dateLabel: conf.formattedDate,
+            timeLabel: conf.confirmedTime
+        )
         currentScreen = .laboratoryInpatientStatus
     }
 
@@ -212,12 +255,28 @@ final class QueueController: ObservableObject {
 
     func showAppointmentSuccess() {
         selectedDashboardTab = .home
+        // Record Book Doctor progress as Scheduled
+        let option = departmentOptions.first { $0.title == bookAppointment.departmentName }
+        let slotTime = bookAppointment.timeSlots.first { $0.id == selectedBookingSlotID }?.time ?? "–"
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "EEE, MMM d"
+        bookDoctorProgress = BookDoctorProgress(
+            departmentName: bookAppointment.departmentName,
+            imageName: option?.imageName ?? "generalOPD",
+            theme: option?.theme ?? .blue,
+            status: .scheduled(
+                dateLabel: dateFormatter.string(from: selectedBookingDate),
+                timeLabel: slotTime
+            )
+        )
         currentScreen = .appointmentSuccess
     }
 
     func showPharmacyStatus() {
         selectedDashboardTab = .home
         pharmacyController.loadMockStatus()
+        // Record Pharmacy progress as Preparing
+        pharmacyProgressEntry = PharmacyProgressEntry(status: .preparing)
         currentScreen = .pharmacyStatus
     }
 
@@ -229,6 +288,8 @@ final class QueueController: ObservableObject {
     func showMedicineCollectionQueue() {
         selectedDashboardTab = .progress
         hasActiveQueue = true
+        // Update Pharmacy progress to In Queue
+        pharmacyProgressEntry = PharmacyProgressEntry(status: .inQueue)
         currentScreen = .medicineCollectionQueue
     }
 
@@ -239,13 +300,15 @@ final class QueueController: ObservableObject {
 
     func showCollectionCompleted() {
         selectedDashboardTab = .progress
+        // Update Pharmacy progress to Completed
+        pharmacyProgressEntry = PharmacyProgressEntry(status: .completed)
         currentScreen = .collectionCompleted
     }
 
     func selectDashboardTab(_ tab: DashboardTab) {
         selectedDashboardTab = tab
         switch tab {
-        case .home, .queue, .map, .user:
+        case .home, .queue, .user:
             currentScreen = .dashboard
         case .progress:
             showQueueStatus()
@@ -268,17 +331,8 @@ final class QueueController: ObservableObject {
     }
 
     func showQueueStatus() {
-        if hasActiveQueue || isMedicineReady {
-            selectedDashboardTab = .progress
-            if isMedicineReady {
-                currentScreen = .medicinesReadyProgress
-            } else {
-                currentScreen = .medicineCollectionQueue
-            }
-        } else {
-            selectedDashboardTab = .progress
-            currentScreen = .noActiveQueue
-        }
+        selectedDashboardTab = .progress
+        currentScreen = .departmentProgress
     }
 
     func selectChild(named name: String) {
