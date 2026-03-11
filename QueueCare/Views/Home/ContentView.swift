@@ -24,6 +24,16 @@ struct ContentView: View {
                 LaboratoryVisitSelectionView(controller: controller, laboratoryController: controller.laboratoryController)
             case .pharmacyStatus:
                 PharmacyStatusView(controller: controller, pharmacyController: controller.pharmacyController)
+            case .medicineCollectionQueue:
+                MedicineCollectionQueueView(controller: controller)
+            case .medicinesReadyProgress:
+                MedicinesReadyProgressView(controller: controller)
+            case .noActiveQueue:
+                NoActiveQueueView(controller: controller)
+            case .collectionCompleted:
+                CollectionCompletedView(controller: controller)
+            case .payment:
+                PaymentView(controller: controller)
             }
         }
     }

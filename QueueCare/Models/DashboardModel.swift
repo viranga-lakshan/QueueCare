@@ -17,7 +17,7 @@ struct DashboardModel {
             DashboardShortcut(title: "Book Doctor", imageName: "doctor", action: .departmentSelection, theme: .blue),
             DashboardShortcut(title: "Lab\nAppointment", imageName: "lab", action: .laboratoryRequest, theme: .sky),
             DashboardShortcut(title: "Pharmacy", imageName: "pharmacy", action: .pharmacyStatus, theme: .mint),
-            DashboardShortcut(title: "My Queue/\nStatus", imageName: "queue", action: .tab(.progress), theme: .indigo)
+            DashboardShortcut(title: "My Queue/\nStatus", imageName: "queue", action: .queueStatus, theme: .indigo)
         ],
         currentVisit: DashboardVisit(
             departmentName: "Cardiology",
@@ -55,6 +55,7 @@ enum DashboardShortcutAction {
     case departmentSelection
     case laboratoryRequest
     case pharmacyStatus
+    case queueStatus
     case tab(DashboardTab)
 }
 
@@ -112,6 +113,7 @@ enum DashboardTab: String, CaseIterable, Identifiable {
     case user
 
     var id: String { rawValue }
+    static let visibleTabs: [DashboardTab] = [.home, .queue, .map, .progress, .user]
 
     var title: String {
         switch self {

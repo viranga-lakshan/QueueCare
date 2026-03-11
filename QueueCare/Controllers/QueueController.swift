@@ -13,6 +13,11 @@ final class QueueController: ObservableObject {
         case laboratoryRequest
         case laboratoryVisitSelection
         case pharmacyStatus
+        case medicineCollectionQueue
+        case medicinesReadyProgress
+        case noActiveQueue
+        case collectionCompleted
+        case payment
     }
 
     @Published private(set) var currentScreen: Screen = .welcome
@@ -21,6 +26,8 @@ final class QueueController: ObservableObject {
     @Published private(set) var activeCount = 0
     @Published private(set) var selectedDashboardTab: DashboardTab = .home
     @Published private(set) var selectedChildName = ""
+    @Published private(set) var isMedicineReady = false
+    @Published private(set) var hasActiveQueue = false
 
     private var model = QueueModel()
     let phoneAuthController = PhoneAuthController()
@@ -129,9 +136,35 @@ final class QueueController: ObservableObject {
         currentScreen = .pharmacyStatus
     }
 
+    func showPayment() {
+        selectedDashboardTab = .home
+        currentScreen = .payment
+    }
+
+    func showMedicineCollectionQueue() {
+        selectedDashboardTab = .progress
+        hasActiveQueue = true
+        currentScreen = .medicineCollectionQueue
+    }
+
+    func completeMedicineQueueAndShowDashboard() {
+        isMedicineReady = true
+        showDashboard()
+    }
+
+    func showCollectionCompleted() {
+        selectedDashboardTab = .progress
+        currentScreen = .collectionCompleted
+    }
+
     func selectDashboardTab(_ tab: DashboardTab) {
         selectedDashboardTab = tab
-        currentScreen = .dashboard
+        switch tab {
+        case .home, .queue, .map, .user:
+            currentScreen = .dashboard
+        case .progress:
+            showQueueStatus()
+        }
     }
 
     func handleDashboardShortcut(_ shortcut: DashboardShortcut) {
@@ -142,8 +175,24 @@ final class QueueController: ObservableObject {
             showLaboratoryRequest()
         case .pharmacyStatus:
             showPharmacyStatus()
+        case .queueStatus:
+            showQueueStatus()
         case let .tab(tab):
             selectDashboardTab(tab)
+        }
+    }
+
+    func showQueueStatus() {
+        if hasActiveQueue || isMedicineReady {
+            selectedDashboardTab = .progress
+            if isMedicineReady {
+                currentScreen = .medicinesReadyProgress
+            } else {
+                currentScreen = .medicineCollectionQueue
+            }
+        } else {
+            selectedDashboardTab = .progress
+            currentScreen = .noActiveQueue
         }
     }
 
@@ -156,12 +205,10 @@ final class QueueController: ObservableObject {
         model.addPatient(named: name)
         syncFromModel()
     }
-
     func callPatient(id: UUID) {
         model.callPatient(id: id)
         syncFromModel()
     }
-
     func completePatient(id: UUID) {
         model.completePatient(id: id)
         syncFromModel()
