@@ -52,6 +52,10 @@ struct ContentView: View {
                 SelectPatientView(controller: controller)
             case .profileSetup:
                 ProfileSetupView(controller: controller)
+            case .liveQueue:
+                LiveQueueView(controller: controller)
+            case .departmentProgress:
+                DepartmentProgressView(controller: controller)
             }
         }
     }
