@@ -12,4 +12,8 @@ final class PharmacyController: ObservableObject {
     func loadMockStatus() {
         status = .mock
     }
+
+    func loadBillReadyStatus() {
+        status = .billReadyMock
+    }
 }

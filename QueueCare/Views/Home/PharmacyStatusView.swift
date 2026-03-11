@@ -9,7 +9,14 @@ struct PharmacyStatusView: View {
     private let textColor = Color(red: 0.14, green: 0.16, blue: 0.18)
     private let mutedTextColor = Color(red: 0.42, green: 0.45, blue: 0.48)
     private let iconBlue = Color(red: 43 / 255, green: 79 / 255, blue: 142 / 255)
-    private let statusCardColor = Color(red: 166 / 255, green: 193 / 255, blue: 234 / 255)
+    private var statusCardColor: Color {
+        switch status.style {
+        case .preparing:
+            return Color(red: 166 / 255, green: 193 / 255, blue: 234 / 255)
+        case .billReady:
+            return Color(red: 163 / 255, green: 210 / 255, blue: 177 / 255)
+        }
+    }
 
     private var status: PharmacyStatus {
         pharmacyController.status
@@ -47,7 +54,11 @@ struct PharmacyStatusView: View {
                         .padding(.top, 28)
 
                     Button {
-                        pharmacyController.loadMockStatus()
+                        if status.style == .preparing {
+                            pharmacyController.loadBillReadyStatus()
+                        } else {
+                            controller.showPayment()
+                        }
                     } label: {
                         HStack(spacing: 12) {
                             Text(status.buttonTitle)

@@ -1,6 +1,12 @@
 import Foundation
 
 struct PharmacyStatus {
+    enum Style {
+        case preparing
+        case billReady
+    }
+
+    let style: Style
     let title: String
     let heading: String
     let subtitle: String
@@ -11,6 +17,7 @@ struct PharmacyStatus {
     let medications: [PrescribedMedication]
 
     static let mock = PharmacyStatus(
+        style: .preparing,
         title: "Pharmacy",
         heading: "Prescription Sent to\nPharmacy",
         subtitle: "Your medicines are being prepared",
@@ -18,6 +25,34 @@ struct PharmacyStatus {
         currentStatusValue: "Preparing Bill",
         medicationsTitle: "Prescribed Medicines",
         buttonTitle: "View Pharmacy Status",
+        medications: [
+            PrescribedMedication(
+                name: "Paracetamol 500mg",
+                dosage: "1 tablet, 3 times daily",
+                schedule: "After meals - 5 days"
+            ),
+            PrescribedMedication(
+                name: "Amoxicillin 250mg",
+                dosage: "1 capsule, 2 times daily",
+                schedule: "Before meals - 7 days"
+            ),
+            PrescribedMedication(
+                name: "Vitamin D 1000 IU",
+                dosage: "1 tablet, once daily",
+                schedule: "After breakfast - 30 days"
+            )
+        ]
+    )
+
+    static let billReadyMock = PharmacyStatus(
+        style: .billReady,
+        title: "Pharmacy",
+        heading: "Your Pharmacy Bill\nIs ready",
+        subtitle: "Please review and proceed",
+        currentStatusLabel: "Estimated Preparation Time",
+        currentStatusValue: "10–15 minutes",
+        medicationsTitle: "Bill Breakdown",
+        buttonTitle: "Proceed to Payment",
         medications: [
             PrescribedMedication(
                 name: "Paracetamol 500mg",

@@ -7,7 +7,7 @@ struct AppBottomNavigationBar: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(DashboardTab.allCases) { tab in
+            ForEach(DashboardTab.visibleTabs) { tab in
                 Button {
                     action(tab)
                 } label: {
