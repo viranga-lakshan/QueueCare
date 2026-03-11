@@ -13,7 +13,7 @@ struct LaboratoryRequest {
 
     static let mock = LaboratoryRequest(
         title: "Laboratory",
-        currentStep: 1,
+        currentStep: 2,
         totalSteps: 7,
         heading: "Lab Test Required",
         doctorName: "Dr. Carter",

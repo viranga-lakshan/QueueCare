@@ -12,6 +12,13 @@ final class QueueController: ObservableObject {
         case departmentSelection
         case laboratoryRequest
         case laboratoryVisitSelection
+        case laboratoryAppointment
+        case laboratoryPayment
+        case laboratoryConfirmation
+        case laboratoryInpatientStatus
+        case bookAppointment
+        case appointmentPayment
+        case appointmentSuccess
         case pharmacyStatus
     }
 
@@ -21,6 +28,11 @@ final class QueueController: ObservableObject {
     @Published private(set) var activeCount = 0
     @Published private(set) var selectedDashboardTab: DashboardTab = .home
     @Published private(set) var selectedChildName = ""
+    @Published private(set) var bookAppointment: BookAppointment = .mock(for: "")
+    @Published var selectedBookingDate: Date = Date()
+    @Published var selectedBookingSlotID: String?
+    @Published private(set) var appointmentPayment: AppointmentPayment = .mock(departmentName: "", patientName: "")
+    @Published var selectedAppointmentPaymentMethodID: String = "card"
 
     private var model = QueueModel()
     let phoneAuthController = PhoneAuthController()
@@ -122,6 +134,63 @@ final class QueueController: ObservableObject {
         laboratoryController.loadMockVisitSelection()
         currentScreen = .laboratoryVisitSelection
     }
+    
+    func showLaboratoryAppointment() {
+        selectedDashboardTab = .home
+        laboratoryController.loadMockAppointment()
+        currentScreen = .laboratoryAppointment
+    }
+    
+    func showLaboratoryPayment() {
+        selectedDashboardTab = .home
+        laboratoryController.loadMockPayment()
+        currentScreen = .laboratoryPayment
+    }
+
+    func showLaboratoryConfirmation() {
+        selectedDashboardTab = .home
+        laboratoryController.loadMockConfirmation()
+        currentScreen = .laboratoryConfirmation
+    }
+
+    func showLaboratoryInpatientStatus() {
+        selectedDashboardTab = .home
+        laboratoryController.loadMockInpatientStatus()
+        currentScreen = .laboratoryInpatientStatus
+    }
+
+    func showBookAppointment(for option: DepartmentOption) {
+        selectedDashboardTab = .home
+        bookAppointment = .mock(for: option.title)
+        selectedBookingDate = Date()
+        selectedBookingSlotID = nil
+        currentScreen = .bookAppointment
+    }
+
+    func selectBookingSlot(_ slotID: String) {
+        selectedBookingSlotID = slotID
+    }
+
+    func showAppointmentPayment() {
+        selectedDashboardTab = .home
+        appointmentPayment = .mock(departmentName: bookAppointment.departmentName, patientName: dashboard.patientName)
+        selectedAppointmentPaymentMethodID = "card"
+        currentScreen = .appointmentPayment
+    }
+
+    func showBookAppointmentBack() {
+        selectedDashboardTab = .home
+        currentScreen = .bookAppointment
+    }
+
+    func selectAppointmentPaymentMethod(_ id: String) {
+        selectedAppointmentPaymentMethodID = id
+    }
+
+    func showAppointmentSuccess() {
+        selectedDashboardTab = .home
+        currentScreen = .appointmentSuccess
+    }
 
     func showPharmacyStatus() {
         selectedDashboardTab = .home
@@ -139,7 +208,7 @@ final class QueueController: ObservableObject {
         case .departmentSelection:
             showDepartmentSelection()
         case .laboratoryRequest:
-            showLaboratoryRequest()
+            showLaboratoryVisitSelection()
         case .pharmacyStatus:
             showPharmacyStatus()
         case let .tab(tab):

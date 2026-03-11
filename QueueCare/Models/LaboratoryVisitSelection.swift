@@ -9,7 +9,7 @@ struct LaboratoryVisitSelection {
 
     static let mock = LaboratoryVisitSelection(
         title: "Laboratory",
-        currentStep: 2,
+        currentStep: 1,
         totalSteps: 7,
         buttonTitle: "Proceed to Laboratory",
         options: [
@@ -25,7 +25,7 @@ struct LaboratoryVisitSelection {
                 title: "Inpatient\nLaboratory",
                 subtitle: "Tests conducted in ward",
                 icon: .inpatient,
-                isEnabled: false
+                isEnabled: true
             )
         ]
     )
