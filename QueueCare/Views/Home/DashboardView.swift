@@ -43,7 +43,7 @@ struct DashboardView: View {
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .center, spacing: 12) {
-                Text("Hello, \(dashboard.patientName),")
+                Text("Hello, \(controller.userProfile.name.isEmpty ? dashboard.patientName : controller.userProfile.name),")
                     .font(.system(size: 28, weight: .bold, design: .rounded))
                     .foregroundStyle(textColor)
 
@@ -61,7 +61,8 @@ struct DashboardView: View {
                     }
                 } label: {
                     HStack(spacing: 8) {
-                        Text("Child: \(controller.selectedChildName)")
+                        let isPatient = controller.selectablePatients.contains(where: { $0.name == controller.selectedChildName })
+                        Text("\(isPatient ? "Patient" : "Child"): \(controller.selectedChildName)")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(textColor)
 
@@ -80,7 +81,7 @@ struct DashboardView: View {
 
                 Spacer(minLength: 0)
 
-                Button(action: controller.showRegistration) {
+                Button(action: controller.showSelectPatient) {
                     HStack(spacing: 7) {
                         Image(systemName: "person.badge.plus")
                             .font(.system(size: 13, weight: .semibold))
@@ -96,14 +97,19 @@ struct DashboardView: View {
     }
 
     private var avatarView: some View {
-        BundleResourceImage(name: dashboard.avatarImageName, fallbackSystemName: "person.crop.circle.fill")
-            .frame(width: 34, height: 34)
-            .clipShape(Circle())
-            .overlay(
-                Circle()
-                    .stroke(.white, lineWidth: 2)
-            )
-            .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 3)
+        Group {
+            if let photo = controller.userProfile.photo {
+                Image(uiImage: photo)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                BundleResourceImage(name: dashboard.avatarImageName, fallbackSystemName: "person.crop.circle.fill")
+            }
+        }
+        .frame(width: 34, height: 34)
+        .clipShape(Circle())
+        .overlay(Circle().stroke(.white, lineWidth: 2))
+        .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 3)
     }
 
     private var shortcutSection: some View {

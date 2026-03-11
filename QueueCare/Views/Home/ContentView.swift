@@ -48,6 +48,10 @@ struct ContentView: View {
                 CollectionCompletedView(controller: controller)
             case .payment:
                 PaymentView(controller: controller)
+            case .selectPatient:
+                SelectPatientView(controller: controller)
+            case .profileSetup:
+                ProfileSetupView(controller: controller)
             }
         }
     }

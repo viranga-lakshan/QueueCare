@@ -12,7 +12,7 @@ struct DashboardModel {
     static let sample = DashboardModel(
         patientName: "Viranga",
         avatarImageName: "PHOTO-2026-03-10-12-35-46",
-        children: ["Janith", "Nethmi"],
+        children: [],
         shortcuts: [
             DashboardShortcut(title: "Book Doctor", imageName: "doctor", action: .departmentSelection, theme: .blue),
             DashboardShortcut(title: "Lab\nAppointment", imageName: "lab", action: .laboratoryRequest, theme: .sky),

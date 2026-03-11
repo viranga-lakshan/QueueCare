@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import UIKit
 
 @MainActor
 final class QueueController: ObservableObject {
@@ -25,6 +26,8 @@ final class QueueController: ObservableObject {
         case noActiveQueue
         case collectionCompleted
         case payment
+        case selectPatient
+        case profileSetup
     }
 
     @Published private(set) var currentScreen: Screen = .welcome
@@ -40,6 +43,8 @@ final class QueueController: ObservableObject {
     @Published var selectedAppointmentPaymentMethodID: String = "card"
     @Published private(set) var isMedicineReady = false
     @Published private(set) var hasActiveQueue = false
+    @Published private(set) var selectablePatients: [SelectablePatient] = []
+    @Published private(set) var userProfile: UserProfile = .empty
 
     private var model = QueueModel()
     let phoneAuthController = PhoneAuthController()
@@ -76,7 +81,9 @@ final class QueueController: ObservableObject {
     }
 
     var availableChildren: [String] {
-        model.dashboard.children
+        let modelChildren = model.dashboard.children
+        let patientNames = selectablePatients.map(\.name)
+        return modelChildren + patientNames.filter { !modelChildren.contains($0) }
     }
 
     var departmentOptions: [DepartmentOption] {
@@ -100,6 +107,15 @@ final class QueueController: ObservableObject {
 
     func showVerificationSuccess() {
         currentScreen = .verificationSuccess
+    }
+
+    func showProfileSetup() {
+        currentScreen = .profileSetup
+    }
+
+    func saveUserProfile(_ profile: UserProfile) {
+        userProfile = profile
+        showDashboard()
     }
 
     func requestOTP(for phoneNumber: String) async {
@@ -266,7 +282,19 @@ final class QueueController: ObservableObject {
     }
 
     func selectChild(named name: String) {
-        guard availableChildren.contains(name) else { return }
+        let validNames = model.dashboard.children + selectablePatients.map(\.name)
+        guard validNames.contains(name) else { return }
+        selectedChildName = name
+    }
+
+    func showSelectPatient() {
+        selectedDashboardTab = .home
+        currentScreen = .selectPatient
+    }
+
+    func addSelectablePatient(name: String, age: Int, relation: String, contactNumber: String, gender: String, email: String, photo: UIImage?) {
+        let patient = SelectablePatient(name: name, age: age, relation: relation, contactNumber: contactNumber, gender: gender, email: email, photo: photo)
+        selectablePatients.append(patient)
         selectedChildName = name
     }
 
