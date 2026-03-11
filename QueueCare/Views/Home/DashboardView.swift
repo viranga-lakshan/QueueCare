@@ -27,12 +27,11 @@ struct DashboardView: View {
             backgroundColor.ignoresSafeArea()
 
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 16) {
+                VStack(spacing: 20) {
                     headerCard
-                    shortcutGrid
-                    currentVisitCard
-                    nextStepCard
-                    updatesCard
+                    servicesSection
+                    activeStatusSection
+                    quickActionsSection
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 12)
@@ -88,19 +87,24 @@ struct DashboardView: View {
     }
 
     private var avatarView: some View {
-        Group {
-            if let photo = controller.userProfile.photo {
-                Image(uiImage: photo)
-                    .resizable()
-                    .scaledToFill()
-            } else {
-                BundleResourceImage(name: dashboard.avatarImageName, fallbackSystemName: "person.crop.circle.fill")
+        Button {
+            controller.selectDashboardTab(.user)
+        } label: {
+            Group {
+                if let photo = controller.userProfile.photo {
+                    Image(uiImage: photo)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    BundleResourceImage(name: dashboard.avatarImageName, fallbackSystemName: "person.crop.circle.fill")
+                }
             }
+            .frame(width: 42, height: 42)
+            .clipShape(Circle())
+            .overlay(Circle().stroke(Color.white, lineWidth: 2.5))
+            .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 3)
         }
-        .frame(width: 42, height: 42)
-        .clipShape(Circle())
-        .overlay(Circle().stroke(Color.white, lineWidth: 2.5))
-        .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 3)
+        .buttonStyle(.plain)
     }
 
     private var patientDropdown: some View {
@@ -147,336 +151,601 @@ struct DashboardView: View {
         .buttonStyle(.plain)
     }
 
-    // MARK: - Shortcut Grid
-    private var shortcutGrid: some View {
-        HStack(spacing: 10) {
-            shortcutCard(
-                title: "Book\nDoctor",
-                imageName: "doctor",
-                color: bookDoctorColor,
-                action: { controller.handleDashboardShortcut(dashboard.shortcuts[0]) }
-            )
+    // MARK: - Services Section
+    private var servicesSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Services")
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundStyle(textColor)
+                .padding(.horizontal, 4)
 
-            shortcutCard(
-                title: "Lab\nAppointment",
-                imageName: "lab",
-                color: labColor,
-                action: { controller.handleDashboardShortcut(dashboard.shortcuts[1]) }
-            )
+            VStack(spacing: 12) {
+                serviceCard(
+                    title: "Book Doctor Appointment",
+                    subtitle: "Schedule consultation with specialists",
+                    icon: "stethoscope.circle.fill",
+                    color: bookDoctorColor,
+                    action: { controller.handleDashboardShortcut(dashboard.shortcuts[0]) }
+                )
 
-            shortcutCard(
-                title: "Pharmacy",
-                imageName: "pharmacy",
-                color: pharmacyColor,
-                action: { controller.handleDashboardShortcut(dashboard.shortcuts[2]) }
-            )
+                serviceCard(
+                    title: "Lab Appointment",
+                    subtitle: "Book tests and view reports",
+                    icon: "cross.vial.fill",
+                    color: labColor,
+                    action: { controller.handleDashboardShortcut(dashboard.shortcuts[1]) }
+                )
 
-            shortcutCard(
-                title: "My Queue/\nStatus",
-                imageName: "queue",
-                color: queueStatusColor,
-                action: { controller.handleDashboardShortcut(dashboard.shortcuts[3]) }
-            )
+                serviceCard(
+                    title: "Pharmacy",
+                    subtitle: "Track prescriptions and collect medicine",
+                    icon: "pill.circle.fill",
+                    color: pharmacyColor,
+                    action: { controller.handleDashboardShortcut(dashboard.shortcuts[2]) }
+                )
+            }
         }
     }
 
-    private func shortcutCard(title: String, imageName: String, color: Color, action: @escaping () -> Void) -> some View {
+    private func serviceCard(
+        title: String,
+        subtitle: String,
+        icon: String,
+        color: Color,
+        action: @escaping () -> Void
+    ) -> some View {
         Button(action: action) {
-            VStack(spacing: 10) {
-                BundleResourceImage(name: imageName, subdirectory: "dashboard", fallbackSystemName: "cross.case")
-                    .frame(width: 44, height: 44)
+            HStack(spacing: 16) {
+                // Icon
+                ZStack {
+                    Circle()
+                        .fill(color.opacity(0.15))
+                        .frame(width: 56, height: 56)
 
-                Text(title)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.75)
+                    Image(systemName: icon)
+                        .font(.system(size: 26))
+                        .foregroundStyle(color)
+                }
+
+                // Text content
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundStyle(textColor)
+
+                    Text(subtitle)
+                        .font(.system(size: 13))
+                        .foregroundStyle(mutedText)
+                        .lineLimit(1)
+                }
+
+                Spacer()
+
+                // Chevron
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(mutedText.opacity(0.5))
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 100)
+            .padding(16)
             .background(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [color, color.opacity(0.85)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .shadow(color: color.opacity(0.35), radius: 8, x: 0, y: 4)
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color.white)
+                    .shadow(color: .black.opacity(0.06), radius: 10, x: 0, y: 3)
             )
         }
         .buttonStyle(.plain)
     }
 
-    // MARK: - Current Visit Card
-    private var currentVisitCard: some View {
-        VStack(spacing: 0) {
-            // Header
-            HStack {
-                Text("Current visit")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(primaryBlue)
+    // MARK: - Active Status Section
+    private var activeStatusSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Active Visit")
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundStyle(textColor)
+                .padding(.horizontal, 4)
 
-            // Content
-            VStack(alignment: .leading, spacing: 14) {
-                Text(dashboard.currentVisit.departmentName)
+            if let progress = controller.bookDoctorProgress {
+                // Show active visit card with any status
+                activeVisitCardForProgress(progress)
+            } else {
+                // Show empty state
+                noActiveVisitCard
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func activeVisitCardForProgress(_ progress: BookDoctorProgress) -> some View {
+        switch progress.status {
+        case .scheduled(let dateLabel, let timeLabel):
+            scheduledVisitCard(
+                departmentName: progress.departmentName,
+                dateLabel: dateLabel,
+                timeLabel: timeLabel
+            )
+        case .inQueue(let token, let currentServing, let peopleAhead, let waitMin):
+            inQueueVisitCard(
+                departmentName: progress.departmentName,
+                token: token,
+                currentServing: currentServing,
+                peopleAhead: peopleAhead,
+                waitMin: waitMin
+            )
+        case .completed:
+            completedVisitCard(departmentName: progress.departmentName)
+        }
+    }
+
+    private var noActiveVisitCard: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "calendar.badge.clock")
+                .font(.system(size: 48))
+                .foregroundStyle(mutedText.opacity(0.4))
+                .padding(.top, 24)
+
+            VStack(spacing: 6) {
+                Text("No Active Visit")
+                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                    .foregroundStyle(textColor)
+
+                Text("Book a doctor appointment to see your queue status here")
+                    .font(.system(size: 14))
+                    .foregroundStyle(mutedText)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 20)
+            }
+
+            Button {
+                controller.handleDashboardShortcut(dashboard.shortcuts[0])
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "stethoscope")
+                        .font(.system(size: 13))
+                    Text("Book Doctor")
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(brandColor)
+                )
+            }
+            .padding(.bottom, 24)
+        }
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.white)
+                .shadow(color: .black.opacity(0.06), radius: 10, x: 0, y: 3)
+        )
+    }
+
+    private func scheduledVisitCard(
+        departmentName: String,
+        dateLabel: String,
+        timeLabel: String
+    ) -> some View {
+        VStack(spacing: 0) {
+            // Department header
+            HStack {
+                Image(systemName: "calendar.badge.checkmark")
+                    .font(.system(size: 20))
+                    .foregroundStyle(brandColor)
+
+                Text(departmentName)
                     .font(.system(size: 17, weight: .bold, design: .rounded))
                     .foregroundStyle(textColor)
 
-                Divider().background(Color.black.opacity(0.06))
+                Spacer()
 
-                // Metrics grid
-                VStack(spacing: 12) {
-                    HStack {
-                        metricItem(label: "Token:", value: dashboard.currentVisit.tokenLabel, alignment: .leading)
-                        Spacer()
-                        metricItem(label: "Now serving:", value: dashboard.currentVisit.servingLabel, alignment: .trailing)
-                    }
-
-                    HStack {
-                        metricItem(label: "People ahead:", value: String(format: "%02d", dashboard.currentVisit.peopleAhead), alignment: .leading)
-                        Spacer()
-                        metricItem(label: "ETA:", value: dashboard.currentVisit.etaText, alignment: .trailing)
-                    }
-                }
-
-                // Action buttons
-                HStack(spacing: 10) {
-                    visitButton(title: "View queue", icon: nil, filled: true) {
-                        controller.selectDashboardTab(.queue)
-                    }
-
-                    visitButton(title: "Direction", icon: "location.north.fill", filled: false) {}
-
-                    visitButton(title: "Call help", icon: "phone.fill", filled: false) {}
-                }
-                .padding(.top, 4)
+                Text("Scheduled")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(brandColor)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(brandColor.opacity(0.12))
+                    )
             }
             .padding(16)
-            .background(Color.white)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .shadow(color: .black.opacity(0.07), radius: 12, x: 0, y: 4)
-    }
 
-    private func metricItem(label: String, value: String, alignment: HorizontalAlignment) -> some View {
-        HStack(spacing: 4) {
-            if alignment == .leading {
-                Text(label)
-                    .font(.system(size: 13, weight: .regular, design: .rounded))
-                    .foregroundStyle(secondaryText)
-                Text(value)
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
-                    .foregroundStyle(textColor)
-            } else {
-                Text(label)
-                    .font(.system(size: 13, weight: .regular, design: .rounded))
-                    .foregroundStyle(secondaryText)
-                Text(value)
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
-                    .foregroundStyle(textColor)
-            }
-        }
-    }
+            Divider()
 
-    private func visitButton(title: String, icon: String?, filled: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack(spacing: 5) {
-                if let icon {
-                    Image(systemName: icon)
-                        .font(.system(size: 11, weight: .semibold))
+            // Appointment details
+            HStack(spacing: 0) {
+                VStack(spacing: 6) {
+                    Text("Date")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(mutedText)
+
+                    Text(dateLabel)
+                        .font(.system(size: 17, weight: .bold, design: .rounded))
+                        .foregroundStyle(textColor)
                 }
-                Text(title)
+                .frame(maxWidth: .infinity)
+
+                Rectangle()
+                    .fill(Color.gray.opacity(0.2))
+                    .frame(width: 1)
+                    .padding(.vertical, 12)
+
+                VStack(spacing: 6) {
+                    Text("Time")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(mutedText)
+
+                    Text(timeLabel)
+                        .font(.system(size: 17, weight: .bold, design: .rounded))
+                        .foregroundStyle(textColor)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .padding(.vertical, 16)
+
+            Divider()
+
+            // Actions
+            HStack(spacing: 12) {
+                Button {
+                    controller.selectDashboardTab(.progress)
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "calendar")
+                            .font(.system(size: 13))
+                        Text("View Details")
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(brandColor)
+                    )
+                }
+
+                Button {} label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "phone.fill")
+                            .font(.system(size: 13))
+                        Text("Help")
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundStyle(textColor)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .stroke(Color.gray.opacity(0.25), lineWidth: 1.5)
+                    )
+                }
+            }
+            .padding(16)
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.white)
+                .shadow(color: .black.opacity(0.06), radius: 10, x: 0, y: 3)
+        )
+    }
+
+    private func inQueueVisitCard(
+        departmentName: String,
+        token: String,
+        currentServing: String,
+        peopleAhead: Int,
+        waitMin: Int
+    ) -> some View {
+        VStack(spacing: 0) {
+            // Department header
+            HStack {
+                Image(systemName: "heart.text.square.fill")
+                    .font(.system(size: 20))
+                    .foregroundStyle(primaryBlue)
+
+                Text(departmentName)
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .foregroundStyle(textColor)
+
+                Spacer()
+
+                Text("In Queue")
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(primaryBlue)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(primaryBlue.opacity(0.12))
+                    )
             }
-            .foregroundStyle(filled ? .white : textColor)
-            .frame(maxWidth: .infinity)
+            .padding(16)
+
+            Divider()
+
+            // Queue details
+            HStack(spacing: 0) {
+                queueMetric(
+                    label: "Your Token",
+                    value: token,
+                    color: textColor
+                )
+
+                Rectangle()
+                    .fill(Color.gray.opacity(0.2))
+                    .frame(width: 1)
+                    .padding(.vertical, 12)
+
+                queueMetric(
+                    label: "Now Serving",
+                    value: currentServing,
+                    color: brandColor
+                )
+            }
             .padding(.vertical, 12)
-            .background(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(filled ? actionBlue : Color.white)
-            )
-            .overlay {
-                if !filled {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .stroke(Color.black.opacity(0.1), lineWidth: 1)
+
+            Divider()
+
+            // Wait info
+            HStack(spacing: 16) {
+                HStack(spacing: 8) {
+                    Image(systemName: "person.2.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(mutedText)
+                    Text("\(peopleAhead) ahead")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(secondaryText)
+                }
+
+                Spacer()
+
+                HStack(spacing: 8) {
+                    Image(systemName: "clock.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(mutedText)
+                    Text("~\(waitMin) min")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(secondaryText)
                 }
             }
-            .shadow(color: filled ? actionBlue.opacity(0.3) : .clear, radius: 4, x: 0, y: 2)
+            .padding(16)
+            .background(Color.gray.opacity(0.03))
+
+            Divider()
+
+            // Actions
+            HStack(spacing: 12) {
+                Button {
+                    controller.selectDashboardTab(.queue)
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "list.bullet.rectangle.fill")
+                            .font(.system(size: 13))
+                        Text("View Queue")
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(brandColor)
+                    )
+                }
+
+                Button {} label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "phone.fill")
+                            .font(.system(size: 13))
+                        Text("Help")
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundStyle(textColor)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .stroke(Color.gray.opacity(0.25), lineWidth: 1.5)
+                    )
+                }
+            }
+            .padding(16)
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.white)
+                .shadow(color: .black.opacity(0.06), radius: 10, x: 0, y: 3)
+        )
+    }
+
+    private func completedVisitCard(departmentName: String) -> some View {
+        VStack(spacing: 0) {
+            // Department header
+            HStack {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundStyle(Color.green)
+
+                Text(departmentName)
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .foregroundStyle(textColor)
+
+                Spacer()
+
+                Text("Completed")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Color.green)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(Color.green.opacity(0.12))
+                    )
+            }
+            .padding(16)
+
+            Divider()
+
+            // Completion message
+            VStack(spacing: 12) {
+                Image(systemName: "hand.thumbsup.fill")
+                    .font(.system(size: 40))
+                    .foregroundStyle(Color.green.opacity(0.6))
+                    .padding(.top, 8)
+
+                VStack(spacing: 4) {
+                    Text("Visit Completed")
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundStyle(textColor)
+
+                    Text("Thank you for using our services")
+                        .font(.system(size: 13))
+                        .foregroundStyle(mutedText)
+                }
+            }
+            .padding(.vertical, 20)
+
+            Divider()
+
+            // Actions
+            HStack(spacing: 12) {
+                Button {
+                    controller.selectDashboardTab(.progress)
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "calendar")
+                            .font(.system(size: 13))
+                        Text("View History")
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(brandColor)
+                    )
+                }
+
+                Button {
+                    controller.handleDashboardShortcut(dashboard.shortcuts[0])
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 13))
+                        Text("Book Again")
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundStyle(textColor)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .stroke(Color.gray.opacity(0.25), lineWidth: 1.5)
+                    )
+                }
+            }
+            .padding(16)
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.white)
+                .shadow(color: .black.opacity(0.06), radius: 10, x: 0, y: 3)
+        )
+    }
+
+    private func queueMetric(label: String, value: String, color: Color) -> some View {
+        VStack(spacing: 6) {
+            Text(label)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(mutedText)
+
+            Text(value)
+                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .foregroundStyle(color)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Quick Actions Section
+    private var quickActionsSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Quick Actions")
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundStyle(textColor)
+                .padding(.horizontal, 4)
+
+            VStack(spacing: 10) {
+                HStack(spacing: 10) {
+                    quickActionCard(
+                        icon: "calendar.badge.plus",
+                        title: "My\nAppointments",
+                        color: Color(red: 91 / 255, green: 150 / 255, blue: 225 / 255),
+                        action: { controller.selectDashboardTab(.progress) }
+                    )
+
+                    quickActionCard(
+                        icon: "doc.text.fill",
+                        title: "Medical\nRecords",
+                        color: Color(red: 240 / 255, green: 149 / 255, blue: 107 / 255),
+                        action: {}
+                    )
+                }
+
+                HStack(spacing: 10) {
+                    quickActionCard(
+                        icon: "map.fill",
+                        title: "Hospital\nNavigation",
+                        color: Color(red: 147 / 255, green: 112 / 255, blue: 219 / 255),
+                        action: {}
+                    )
+
+                    quickActionCard(
+                        icon: "questionmark.circle.fill",
+                        title: "Help &\nSupport",
+                        color: Color(red: 121 / 255, green: 195 / 255, blue: 160 / 255),
+                        action: {}
+                    )
+                }
+            }
+        }
+    }
+
+    private func quickActionCard(
+        icon: String,
+        title: String,
+        color: Color,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 24))
+                    .foregroundStyle(color)
+                    .frame(width: 40)
+
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundStyle(textColor)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color.white)
+                    .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+            )
         }
         .buttonStyle(.plain)
     }
 
-    // MARK: - Next Step Card
-    private var nextStepCard: some View {
-        VStack(spacing: 0) {
-            // Header
-            HStack {
-                Text(dashboard.flow.title)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(brandColor)
-
-            // Content
-            VStack(spacing: 18) {
-                // Progress steps
-                HStack(spacing: 0) {
-                    ForEach(Array(dashboard.flow.steps.enumerated()), id: \.element.id) { index, step in
-                        stepIndicator(step: step)
-
-                        if index < dashboard.flow.steps.count - 1 {
-                            stepConnector(completed: step.state == .completed)
-                        }
-                    }
-                }
-                .padding(.horizontal, 8)
-
-                // Continue button
-                Button {
-                    controller.selectDashboardTab(.progress)
-                } label: {
-                    Text(dashboard.flow.buttonTitle)
-                        .font(.system(size: 13, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 28)
-                        .padding(.vertical, 10)
-                        .background(
-                            Capsule(style: .continuous)
-                                .fill(brandColor)
-                                .shadow(color: brandColor.opacity(0.35), radius: 6, x: 0, y: 3)
-                        )
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(Color.white)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .shadow(color: .black.opacity(0.07), radius: 12, x: 0, y: 4)
-    }
-
-    private func stepIndicator(step: DashboardFlowStep) -> some View {
-        VStack(spacing: 8) {
-            ZStack {
-                Circle()
-                    .fill(stepBackgroundColor(for: step.state))
-                    .frame(width: 24, height: 24)
-
-                switch step.state {
-                case .completed:
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(.white)
-                case .current:
-                    Circle()
-                        .stroke(Color.black, lineWidth: 2.5)
-                        .frame(width: 24, height: 24)
-                    Circle()
-                        .fill(Color.black)
-                        .frame(width: 10, height: 10)
-                case .upcoming:
-                    EmptyView()
-                }
-            }
-
-            Text(step.title)
-                .font(.system(size: 12, weight: .medium, design: .rounded))
-                .foregroundStyle(step.state == .upcoming ? mutedText : textColor)
-        }
-    }
-
-    private func stepConnector(completed: Bool) -> some View {
-        Rectangle()
-            .fill(completed ? brandColor : Color.black.opacity(0.12))
-            .frame(height: 2)
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 4)
-            .offset(y: -12)
-    }
-
-    private func stepBackgroundColor(for state: DashboardFlowStepState) -> Color {
-        switch state {
-        case .completed: return brandColor
-        case .current: return .clear
-        case .upcoming: return Color.black.opacity(0.12)
-        }
-    }
-
-    // MARK: - Updates Card
-    private var updatesCard: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Updates")
-                .font(.system(size: 16, weight: .bold, design: .rounded))
-                .foregroundStyle(textColor)
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
-                .padding(.bottom, 12)
-
-            Divider().padding(.horizontal, 16)
-
-            VStack(spacing: 0) {
-                ForEach(Array(dashboard.updates.enumerated()), id: \.element.id) { index, update in
-                    updateRow(update: update)
-
-                    if index < dashboard.updates.count - 1 {
-                        Divider().padding(.horizontal, 16)
-                    }
-                }
-            }
-            .padding(.bottom, 8)
-        }
-        .background(cardSurface)
-    }
-
-    private func updateRow(update: DashboardUpdate) -> some View {
-        HStack(spacing: 12) {
-            // Icon
-            Image(systemName: "checkmark")
-                .font(.system(size: 14, weight: .bold))
-                .foregroundStyle(update.icon == .confirmed ? brandColor : warningYellow)
-                .frame(width: 20)
-
-            // Title
-            Text(update.title)
-                .font(.system(size: 13, weight: .medium, design: .rounded))
-                .foregroundStyle(textColor)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .lineLimit(2)
-
-            // Action button
-            Button {
-                if let destination = update.actionDestination {
-                    controller.selectDashboardTab(destination)
-                }
-            } label: {
-                Text(update.actionTitle)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 7)
-                    .background(
-                        Capsule(style: .continuous)
-                            .fill(actionBlue)
-                    )
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-    }
-
+    // MARK: - Shortcut Grid (Legacy - Removed)
     // MARK: - Shared Components
     private var cardSurface: some View {
         RoundedRectangle(cornerRadius: 14, style: .continuous)

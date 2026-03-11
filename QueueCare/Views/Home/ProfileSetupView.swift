@@ -23,17 +23,42 @@ struct ProfileSetupView: View {
         ZStack {
             backgroundColor.ignoresSafeArea()
 
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 24) {
-                    headerSection
-                    photoPicker
-                    formCard
-                    submitButton
+            VStack(spacing: 0) {
+                // Back button
+                HStack {
+                    Button {
+                        controller.selectDashboardTab(.user)
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 16, weight: .semibold))
+                            Text("Back")
+                                .font(.system(size: 16, weight: .medium))
+                        }
+                        .foregroundStyle(brandColor)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 12)
+                    
+                    Spacer()
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 20)
-                .padding(.bottom, 40)
+                
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 24) {
+                        headerSection
+                        photoPicker
+                        formCard
+                        submitButton
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 12)
+                    .padding(.bottom, 40)
+                }
             }
+        }
+        .onAppear {
+            loadExistingProfile()
         }
     }
 
@@ -41,7 +66,7 @@ struct ProfileSetupView: View {
 
     private var headerSection: some View {
         VStack(spacing: 6) {
-            Text("Complete Your Profile")
+            Text(controller.userProfile.name.isEmpty ? "Complete Your Profile" : "Edit Profile")
                 .font(.system(size: 26, weight: .bold, design: .rounded))
                 .foregroundStyle(textColor)
 
@@ -220,7 +245,7 @@ struct ProfileSetupView: View {
 
     private var submitButton: some View {
         Button(action: submit) {
-            Text("Get Started")
+            Text(controller.userProfile.name.isEmpty ? "Get Started" : "Save Changes")
                 .font(.system(size: 16, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
@@ -255,6 +280,17 @@ struct ProfileSetupView: View {
                 photo: profileImage
             )
         )
+    }
+
+    private func loadExistingProfile() {
+        let profile = controller.userProfile
+        if !profile.name.isEmpty {
+            name = profile.name
+            contactNumber = profile.contactNumber
+            email = profile.email
+            gender = profile.gender
+            profileImage = profile.photo
+        }
     }
 }
 

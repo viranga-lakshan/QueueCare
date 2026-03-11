@@ -121,7 +121,8 @@ final class QueueController: ObservableObject {
 
     func saveUserProfile(_ profile: UserProfile) {
         userProfile = profile
-        showDashboard()
+        selectedDashboardTab = .user
+        currentScreen = .dashboard
     }
 
     func showLiveQueue() {

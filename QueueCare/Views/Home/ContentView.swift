@@ -15,7 +15,11 @@ struct ContentView: View {
             case .verificationSuccess:
                 VerificationSuccessView(controller: controller, phoneAuthController: controller.phoneAuthController)
             case .dashboard:
-                DashboardView(controller: controller)
+                if controller.selectedDashboardTab == .user {
+                    UserSectionView(controller: controller)
+                } else {
+                    DashboardView(controller: controller)
+                }
             case .departmentSelection:
                 DepartmentSelectionView(controller: controller)
             case .laboratoryRequest:
