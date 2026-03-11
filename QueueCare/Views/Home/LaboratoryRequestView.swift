@@ -55,7 +55,7 @@ struct LaboratoryRequestView: View {
                     requestedTestsCard
                         .padding(.top, 34)
 
-                    Button(action: controller.showLaboratoryVisitSelection) {
+                    Button(action: controller.showLaboratoryAppointment) {
                         Text(request.buttonTitle)
                             .font(.system(size: 21, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
@@ -85,7 +85,7 @@ struct LaboratoryRequestView: View {
 
     private var topBar: some View {
         HStack {
-            Button(action: controller.showDashboard) {
+            Button(action: controller.showLaboratoryVisitSelection) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(textColor)

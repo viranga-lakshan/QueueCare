@@ -46,7 +46,13 @@ struct LaboratoryVisitSelectionView: View {
 
                 Spacer(minLength: 0)
 
-                Button(action: laboratoryController.loadMockVisitSelection) {
+                Button {
+                    if laboratoryController.selectedVisitOptionID == .inpatient {
+                        controller.showLaboratoryInpatientStatus()
+                    } else {
+                        controller.showLaboratoryRequest()
+                    }
+                } label: {
                     Text(selection.buttonTitle)
                         .font(.system(size: 18, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
@@ -74,7 +80,7 @@ struct LaboratoryVisitSelectionView: View {
 
     private var topBar: some View {
         HStack {
-            Button(action: controller.showLaboratoryRequest) {
+            Button(action: controller.showDepartmentSelection) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(textColor)

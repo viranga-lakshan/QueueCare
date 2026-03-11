@@ -77,6 +77,7 @@ struct DepartmentSelectionView: View {
 
     private func departmentCard(for option: DepartmentOption) -> some View {
         Button {
+            controller.showBookAppointment(for: option)
         } label: {
             HStack(spacing: 18) {
                 ZStack {
