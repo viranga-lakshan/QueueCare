@@ -125,7 +125,7 @@ struct BookAppointmentView: View {
                     .padding(.top, 22)
 
                     // MARK: Join Live Queue
-                    Button(action: {}) {
+                    Button(action: controller.showLiveQueue) {
                         HStack(spacing: 16) {
                             Image(systemName: "person.2.fill")
                                 .font(.system(size: 32, weight: .medium))
