@@ -13,6 +13,9 @@ final class LaboratoryController: ObservableObject {
     @Published var selectedPaymentMethodID: String?
     @Published private(set) var confirmation = LaboratoryConfirmation.mock
     @Published private(set) var inpatientStatus = LaboratoryInpatientStatus.mock
+    @Published private(set) var testProgress = LaboratoryTestProgress.mock
+    @Published private(set) var testCompletion = LaboratoryTestCompletion.mock
+    @Published private(set) var doctorReview = LaboratoryDoctorReview.mock
 
     init() {
         loadMockRequest()
@@ -21,6 +24,9 @@ final class LaboratoryController: ObservableObject {
         loadMockPayment()
         loadMockConfirmation()
         loadMockInpatientStatus()
+        loadMockTestProgress()
+        loadMockTestCompletion()
+        loadMockDoctorReview()
     }
 
     func loadMockRequest() {
@@ -64,5 +70,17 @@ final class LaboratoryController: ObservableObject {
 
     func loadMockInpatientStatus() {
         inpatientStatus = .mock
+    }
+    
+    func loadMockTestProgress() {
+        testProgress = .mock
+    }
+    
+    func loadMockTestCompletion() {
+        testCompletion = .mock
+    }
+    
+    func loadMockDoctorReview() {
+        doctorReview = .mock
     }
 }

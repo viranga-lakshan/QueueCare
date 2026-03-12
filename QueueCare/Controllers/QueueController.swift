@@ -17,6 +17,9 @@ final class QueueController: ObservableObject {
         case laboratoryPayment
         case laboratoryConfirmation
         case laboratoryInpatientStatus
+        case laboratoryTestProgress
+        case laboratoryTestCompletion
+        case laboratoryDoctorReview
         case bookAppointment
         case appointmentPayment
         case appointmentSuccess
@@ -226,8 +229,25 @@ final class QueueController: ObservableObject {
             timeLabel: conf.confirmedTime
         )
         currentScreen = .laboratoryInpatientStatus
+    }    
+    func showLaboratoryTestProgress() {
+        selectedDashboardTab = .home
+        laboratoryController.loadMockTestProgress()
+        currentScreen = .laboratoryTestProgress
     }
-
+    
+    func showLaboratoryTestCompletion() {
+        selectedDashboardTab = .home
+        laboratoryController.loadMockTestCompletion()
+        currentScreen = .laboratoryTestCompletion
+    }
+    
+    func showLaboratoryDoctorReview() {
+        selectedDashboardTab = .home
+        laboratoryController.loadMockDoctorReview()
+        currentScreen = .laboratoryDoctorReview
+    }
+    
     func showBookAppointment(for option: DepartmentOption) {
         selectedDashboardTab = .home
         bookAppointment = .mock(for: option.title)

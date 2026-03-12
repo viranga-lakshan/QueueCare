@@ -7,9 +7,9 @@ struct LaboratoryRequestView: View {
     private let backgroundColor = Color(red: 0.92, green: 0.95, blue: 0.95)
     private let brandColor = Color(red: 7 / 255, green: 169 / 255, blue: 150 / 255)
     private let textColor = Color(red: 0.14, green: 0.16, blue: 0.18)
-    private let mutedTextColor = Color(red: 0.43, green: 0.46, blue: 0.49)
+    private let mutedTextColor = Color(red: 0.44, green: 0.47, blue: 0.5)
     private let cardTint = Color(red: 204 / 255, green: 230 / 255, blue: 240 / 255)
-    private let iconBlue = Color(red: 36 / 255, green: 73 / 255, blue: 138 / 255)
+    private let iconBlue = Color(red: 45 / 255, green: 81 / 255, blue: 145 / 255)
 
     private var request: LaboratoryRequest {
         laboratoryController.request
@@ -20,58 +20,59 @@ struct LaboratoryRequestView: View {
             backgroundColor
                 .ignoresSafeArea()
 
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 0) {
-                    topBar
-                        .padding(.top, 18)
+            VStack(spacing: 0) {
+                topBar
+                    .padding(.top, 12)
+                    .padding(.horizontal, 22)
 
-                    VStack(spacing: 8) {
-                        Text(request.title)
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .foregroundStyle(textColor)
+                VStack(spacing: 5) {
+                    Text(request.title)
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .foregroundStyle(textColor)
 
-                        Text("Step \(request.currentStep) / \(request.totalSteps)")
-                            .font(.system(size: 13, weight: .semibold, design: .rounded))
-                            .foregroundStyle(mutedTextColor)
-                    }
-                    .padding(.top, 26)
-
-                    laboratoryIcon
-                        .padding(.top, 44)
-
-                    VStack(spacing: 14) {
-                        Text(request.heading)
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .foregroundStyle(textColor)
-
-                        Text("\(request.doctorName) \(request.description)")
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
-                            .foregroundStyle(mutedTextColor)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 24)
-                    }
-                    .padding(.top, 34)
-
-                    requestedTestsCard
-                        .padding(.top, 34)
-
-                    Button(action: controller.showLaboratoryAppointment) {
-                        Text(request.buttonTitle)
-                            .font(.system(size: 21, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 18)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .fill(brandColor)
-                                    .shadow(color: brandColor.opacity(0.24), radius: 10, x: 0, y: 6)
-                            )
-                    }
-                    .buttonStyle(.plain)
-                    .padding(.top, 56)
-                    .padding(.bottom, 36)
+                    Text("Step \(request.currentStep) / \(request.totalSteps)")
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .foregroundStyle(mutedTextColor)
                 }
-                .padding(.horizontal, 30)
+                .padding(.top, 14)
+
+                laboratoryIcon
+                    .padding(.top, 18)
+
+                VStack(spacing: 8) {
+                    Text(request.heading)
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundStyle(textColor)
+
+                    Text("\(request.doctorName) \(request.description)")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(mutedTextColor)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 20)
+                        .lineLimit(2)
+                }
+                .padding(.top, 16)
+
+                requestedTestsCard
+                    .padding(.top, 16)
+
+                Spacer(minLength: 0)
+
+                Button(action: controller.showLaboratoryTestProgress) {
+                    Text("View Test Progress")
+                        .font(.system(size: 17, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 15)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(brandColor)
+                                .shadow(color: brandColor.opacity(0.24), radius: 10, x: 0, y: 6)
+                        )
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 22)
+                .padding(.bottom, 20)
             }
         }
         .safeAreaInset(edge: .bottom) {
@@ -117,43 +118,45 @@ struct LaboratoryRequestView: View {
         ZStack {
             Circle()
                 .fill(cardTint)
-                .frame(width: 108, height: 108)
+                .frame(width: 70, height: 70)
 
             Image(systemName: "flask.fill")
-                .font(.system(size: 40, weight: .semibold))
+                .font(.system(size: 28, weight: .semibold))
                 .foregroundStyle(iconBlue)
         }
     }
 
     private var requestedTestsCard: some View {
-        VStack(alignment: .leading, spacing: 18) {
+        VStack(alignment: .leading, spacing: 12) {
             Text(request.cardTitle)
-                .font(.system(size: 18, weight: .medium, design: .rounded))
-                .foregroundStyle(Color.black.opacity(0.78))
+                .font(.system(size: 15, weight: .medium, design: .rounded))
+                .foregroundStyle(mutedTextColor)
 
-            VStack(spacing: 18) {
+            VStack(spacing: 10) {
                 ForEach(request.tests) { test in
-                    HStack(spacing: 16) {
+                    HStack(spacing: 10) {
                         Image(systemName: test.icon.systemName)
-                            .font(.system(size: 22, weight: .semibold))
+                            .font(.system(size: 18, weight: .semibold))
                             .foregroundStyle(iconBlue)
-                            .frame(width: 28)
+                            .frame(width: 22)
 
                         Text(test.name)
-                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .font(.system(size: 15, weight: .semibold, design: .rounded))
                             .foregroundStyle(textColor)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
             }
         }
-        .padding(.horizontal, 26)
-        .padding(.vertical, 26)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(cardTint)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(.white)
+                .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
         )
+        .padding(.horizontal, 22)
     }
 }
 

@@ -136,6 +136,23 @@ struct LaboratoryInpatientStatusView: View {
                     )
                     .padding(.horizontal, 22)
                     .padding(.top, 16)
+                    .padding(.bottom, 24)
+                    
+                    // Continue Button
+                    Button(action: controller.showLaboratoryTestProgress) {
+                        Text("View Test Progress")
+                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 17)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .fill(brandColor)
+                                    .shadow(color: brandColor.opacity(0.24), radius: 10, x: 0, y: 6)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 22)
                     .padding(.bottom, 36)
                 }
             }

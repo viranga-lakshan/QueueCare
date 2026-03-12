@@ -34,6 +34,12 @@ struct ContentView: View {
                 LaboratoryConfirmationView(controller: controller, laboratoryController: controller.laboratoryController)
             case .laboratoryInpatientStatus:
                 LaboratoryInpatientStatusView(controller: controller, laboratoryController: controller.laboratoryController)
+            case .laboratoryTestProgress:
+                LaboratoryTestProgressView(controller: controller, laboratoryController: controller.laboratoryController)
+            case .laboratoryTestCompletion:
+                LaboratoryTestCompletionView(controller: controller, laboratoryController: controller.laboratoryController)
+            case .laboratoryDoctorReview:
+                LaboratoryDoctorReviewView(controller: controller, laboratoryController: controller.laboratoryController)
             case .bookAppointment:
                 BookAppointmentView(controller: controller)
             case .appointmentPayment:
