@@ -21,6 +21,21 @@ struct BookDoctorProgress {
     let imageName: String
     let theme: DepartmentAccentTheme
     let status: BookDoctorStatus
+    
+    var sfSymbol: String {
+        switch departmentName {
+        case "General OPD":
+            return "stethoscope.circle.fill"
+        case "Pediatrics":
+            return "figure.and.child.holdinghands"
+        case "Cardiology":
+            return "heart.text.square.fill"
+        case "Ophthalmology":
+            return "eye.circle.fill"
+        default:
+            return "cross.case.fill"
+        }
+    }
 }
 
 // MARK: – Lab Progress

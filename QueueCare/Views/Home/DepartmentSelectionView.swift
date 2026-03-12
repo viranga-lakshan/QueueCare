@@ -86,8 +86,9 @@ struct DepartmentSelectionView: View {
                         .frame(width: 58, height: 58)
                         .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
 
-                    BundleResourceImage(name: option.imageName, subdirectory: "departments", fallbackSystemName: "cross.case")
-                        .frame(width: 28, height: 28)
+                    Image(systemName: option.sfSymbol)
+                        .font(.system(size: 26, weight: .medium))
+                        .foregroundStyle(.white)
                 }
 
                 Text(option.title)

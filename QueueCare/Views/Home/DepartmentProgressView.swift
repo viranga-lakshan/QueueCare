@@ -127,8 +127,9 @@ struct DepartmentProgressView: View {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .fill(iconGradient(for: doc.theme))
                         .frame(width: 48, height: 48)
-                    BundleResourceImage(name: doc.imageName, subdirectory: "departments", fallbackSystemName: "cross.case")
-                        .frame(width: 24, height: 24)
+                    Image(systemName: doc.sfSymbol)
+                        .font(.system(size: 22, weight: .medium))
+                        .foregroundStyle(.white)
                 }
                 Text(doc.departmentName)
                     .font(.system(size: 16, weight: .semibold, design: .rounded))

@@ -32,6 +32,6 @@ struct LaboratoryConfirmation {
                 "Bring ID and insurance card"
             ]
         ),
-        buttonTitle: "Add to Calendar"
+        buttonTitle: "Done"
     )
 }
