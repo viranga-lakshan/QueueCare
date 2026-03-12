@@ -13,33 +13,33 @@ struct DepartmentSelectionView: View {
             backgroundColor
                 .ignoresSafeArea()
 
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 0) {
-                    topBar
-                        .padding(.top, 18)
+            VStack(spacing: 0) {
+                topBar
+                    .padding(.top, 12)
 
-                    VStack(spacing: 12) {
-                        Text("Select Department")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .foregroundStyle(textColor)
+                VStack(spacing: 10) {
+                    Text("Select Department")
+                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .foregroundStyle(textColor)
 
-                        Text("Select the medical department for\nyour consultation")
-                            .font(.system(size: 16, weight: .regular, design: .rounded))
-                            .foregroundStyle(mutedTextColor)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(.top, 26)
-
-                    VStack(spacing: 22) {
-                        ForEach(controller.departmentOptions) { option in
-                            departmentCard(for: option)
-                        }
-                    }
-                    .padding(.top, 42)
+                    Text("Select the medical department for\nyour consultation")
+                        .font(.system(size: 15, weight: .regular, design: .rounded))
+                        .foregroundStyle(mutedTextColor)
+                        .multilineTextAlignment(.center)
                 }
-                .padding(.horizontal, 26)
-                .padding(.bottom, 36)
+                .padding(.top, 18)
+
+                VStack(spacing: 14) {
+                    ForEach(controller.departmentOptions) { option in
+                        departmentCard(for: option)
+                    }
+                }
+                .padding(.top, 24)
+
+                Spacer(minLength: 0)
             }
+            .padding(.horizontal, 22)
+            .padding(.bottom, 12)
         }
         .safeAreaInset(edge: .bottom) {
             AppBottomNavigationBar(selectedTab: controller.selectedDashboardTab, accentColor: brandColor) { tab in
@@ -84,27 +84,27 @@ struct DepartmentSelectionView: View {
         Button {
             controller.showBookAppointment(for: option)
         } label: {
-            HStack(spacing: 18) {
+            HStack(spacing: 16) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .fill(iconBackgroundColor(for: option.theme))
-                        .frame(width: 58, height: 58)
-                        .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
+                        .frame(width: 52, height: 52)
+                        .shadow(color: .black.opacity(0.07), radius: 8, x: 0, y: 4)
 
                     Image(systemName: option.sfSymbol)
-                        .font(.system(size: 26, weight: .medium))
+                        .font(.system(size: 24, weight: .medium))
                         .foregroundStyle(.white)
                 }
 
                 Text(option.title)
-                    .font(.system(size: 22, weight: .semibold, design: .rounded))
+                    .font(.system(size: 20, weight: .semibold, design: .rounded))
                     .foregroundStyle(textColor)
 
                 Spacer(minLength: 0)
             }
-            .padding(.horizontal, 22)
+            .padding(.horizontal, 18)
             .frame(maxWidth: .infinity)
-            .frame(height: 112)
+            .frame(height: 92)
             .background(
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .fill(.white.opacity(0.95))
@@ -121,7 +121,7 @@ struct DepartmentSelectionView: View {
         case .purple:
             return LinearGradient(colors: [Color(red: 202 / 255, green: 104 / 255, blue: 245 / 255), Color(red: 174 / 255, green: 87 / 255, blue: 230 / 255)], startPoint: .topLeading, endPoint: .bottomTrailing)
         case .coral:
-            return LinearGradient(colors: [Color(red: 251 / 255, green: 110 / 255, blue: 118 / 255), Color(red: 243 / 255, green: 86 / 255, blue: 100 / 255)], startPoint: .topLeading, endPoint: .bottomTrailing)
+            return LinearGradient(colors: [Color(red: 0 / 255, green: 184 / 255, blue: 212 / 255), Color(red: 0 / 255, green: 150 / 255, blue: 136 / 255)], startPoint: .topLeading, endPoint: .bottomTrailing)
         }
     }
 }

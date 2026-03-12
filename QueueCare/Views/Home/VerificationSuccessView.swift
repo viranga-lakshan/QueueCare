@@ -40,9 +40,9 @@ struct VerificationSuccessView: View {
                 }
                 .padding(.top, 38)
 
-                Spacer()
+                Spacer(minLength: 0)
 
-                VStack(spacing: 20) {
+                VStack(spacing: 18) {
                     verifiedBadge
 
                     VStack(spacing: 8) {
@@ -55,34 +55,28 @@ struct VerificationSuccessView: View {
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
                     }
-
-                    Button(action: controller.showDashboard) {
-                        Text("Let's Explore")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(
-                                Capsule(style: .continuous)
-                                    .fill(brandColor)
-                            )
-                    }
-                    .padding(.horizontal, 42)
-                    .padding(.top, 12)
                 }
-                .padding(.vertical, 40)
-                .background(
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .fill(.white)
-                        .shadow(color: .black.opacity(0.06), radius: 20, x: 0, y: 10)
-                )
-                .padding(.horizontal, 24)
+                .padding(.bottom, 26)
 
-                Spacer()
-                Spacer(minLength: 160)
+                Button(action: controller.showDashboard) {
+                    Text("Let's Explore")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(brandColor)
+                        )
+                }
+                .padding(.horizontal, 42)
+                .padding(.bottom, 28)
+
+                Spacer(minLength: 140)
             }
 
-            waveFooter
+            RegistrationWaveFooter(color: brandColor)
+                .ignoresSafeArea(edges: .bottom)
         }
     }
 
@@ -126,20 +120,6 @@ struct VerificationSuccessView: View {
         .padding(.horizontal, 18)
     }
 
-    private var waveFooter: some View {
-        VStack(spacing: 0) {
-            WaveShape()
-                .fill(brandColor.opacity(0.3))
-                .frame(height: 120)
-                .overlay(alignment: .bottom) {
-                    Rectangle()
-                        .fill(brandColor.opacity(0.3))
-                        .frame(height: 60)
-                }
-        }
-        .ignoresSafeArea(edges: .bottom)
-    }
-
     private var successMessage: String {
         if phoneAuthController.currentPhoneNumber.isEmpty {
             return "Your phone number has been\nsuccessfully verified"
@@ -153,37 +133,6 @@ struct VerificationSuccessView: View {
         let startIndex = phoneAuthController.lastVerifiedCode.index(phoneAuthController.lastVerifiedCode.startIndex, offsetBy: index)
         let endIndex = phoneAuthController.lastVerifiedCode.index(after: startIndex)
         return String(phoneAuthController.lastVerifiedCode[startIndex..<endIndex])
-    }
-}
-
-private struct WaveShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: 0, y: rect.height * 0.45))
-        path.addCurve(
-            to: CGPoint(x: rect.width * 0.25, y: rect.height * 0.38),
-            control1: CGPoint(x: rect.width * 0.08, y: rect.height * 0.22),
-            control2: CGPoint(x: rect.width * 0.17, y: rect.height * 0.58)
-        )
-        path.addCurve(
-            to: CGPoint(x: rect.width * 0.5, y: rect.height * 0.42),
-            control1: CGPoint(x: rect.width * 0.33, y: rect.height * 0.18),
-            control2: CGPoint(x: rect.width * 0.42, y: rect.height * 0.62)
-        )
-        path.addCurve(
-            to: CGPoint(x: rect.width * 0.75, y: rect.height * 0.38),
-            control1: CGPoint(x: rect.width * 0.58, y: rect.height * 0.22),
-            control2: CGPoint(x: rect.width * 0.67, y: rect.height * 0.58)
-        )
-        path.addCurve(
-            to: CGPoint(x: rect.width, y: rect.height * 0.42),
-            control1: CGPoint(x: rect.width * 0.83, y: rect.height * 0.18),
-            control2: CGPoint(x: rect.width * 0.92, y: rect.height * 0.62)
-        )
-        path.addLine(to: CGPoint(x: rect.width, y: rect.height))
-        path.addLine(to: CGPoint(x: 0, y: rect.height))
-        path.closeSubpath()
-        return path
     }
 }
 
