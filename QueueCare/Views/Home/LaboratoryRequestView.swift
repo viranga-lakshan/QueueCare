@@ -36,30 +36,13 @@ struct LaboratoryRequestView: View {
                 }
                 .padding(.top, 14)
 
-                laboratoryIcon
-                    .padding(.top, 18)
-
-                VStack(spacing: 8) {
-                    Text(request.heading)
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundStyle(textColor)
-
-                    Text("\(request.doctorName) \(request.description)")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(mutedTextColor)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 20)
-                        .lineLimit(2)
-                }
-                .padding(.top, 16)
-
-                requestedTestsCard
-                    .padding(.top, 16)
+                requestCard
+                    .padding(.top, 22)
 
                 Spacer(minLength: 0)
 
-                Button(action: controller.showLaboratoryTestProgress) {
-                    Text("View Test Progress")
+                Button(action: controller.showLaboratoryAppointment) {
+                    Text(request.buttonTitle)
                         .font(.system(size: 17, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -126,30 +109,59 @@ struct LaboratoryRequestView: View {
         }
     }
 
-    private var requestedTestsCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(request.cardTitle)
-                .font(.system(size: 15, weight: .medium, design: .rounded))
-                .foregroundStyle(mutedTextColor)
+    private var requestCard: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .top, spacing: 14) {
+                ZStack {
+                    Circle()
+                        .fill(cardTint)
+                        .frame(width: 44, height: 44)
 
-            VStack(spacing: 10) {
-                ForEach(request.tests) { test in
-                    HStack(spacing: 10) {
-                        Image(systemName: test.icon.systemName)
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(iconBlue)
-                            .frame(width: 22)
+                    Image(systemName: "flask.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(iconBlue)
+                }
 
-                        Text(test.name)
-                            .font(.system(size: 15, weight: .semibold, design: .rounded))
-                            .foregroundStyle(textColor)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(request.heading)
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundStyle(textColor)
+
+                    Text("\(request.doctorName) \(request.description)")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(mutedTextColor)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(18)
+
+            Divider()
+                .padding(.horizontal, 18)
+
+            VStack(alignment: .leading, spacing: 12) {
+                Text(request.cardTitle)
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(mutedTextColor)
+
+                VStack(spacing: 10) {
+                    ForEach(request.tests) { test in
+                        HStack(spacing: 10) {
+                            Image(systemName: test.icon.systemName)
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundStyle(iconBlue)
+                                .frame(width: 22)
+
+                            Text(test.name)
+                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .foregroundStyle(textColor)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
                     }
                 }
             }
+            .padding(.horizontal, 18)
+            .padding(.vertical, 16)
         }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)

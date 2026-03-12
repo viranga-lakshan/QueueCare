@@ -19,7 +19,7 @@ struct LaboratoryRequest {
         doctorName: "Dr. Carter",
         description: "has requested the following laboratory tests based on your consultation.",
         cardTitle: "Requested Tests",
-        buttonTitle: "Proceed to Laboratory",
+        buttonTitle: "Book Appointment",
         tests: [
             LaboratoryTest(name: "Completed Blood Count", icon: .blood),
             LaboratoryTest(name: "Chest X-Ray", icon: .xray),
