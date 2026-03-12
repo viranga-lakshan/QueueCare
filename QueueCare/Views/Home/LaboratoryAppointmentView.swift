@@ -73,8 +73,13 @@ struct LaboratoryAppointmentView: View {
             AppBottomNavigationBar(selectedTab: controller.selectedDashboardTab, accentColor: brandColor) { tab in
                 controller.selectDashboardTab(tab)
             }
-            .padding(.top, 8)
-            .background(backgroundColor.opacity(0.97))
+            .padding(.horizontal, 12)
+            .padding(.top, 10)
+            .background(
+                .ultraThinMaterial,
+                in: RoundedRectangle(cornerRadius: 0)
+            )
+            .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: -4)
         }
     }
     
