@@ -34,9 +34,10 @@ struct UserSectionView: View {
             .padding(.horizontal, 12)
             .padding(.top, 10)
             .background(
-                backgroundColor.opacity(0.98)
-                    .shadow(color: .black.opacity(0.04), radius: 8, x: 0, y: -2)
+                .ultraThinMaterial,
+                in: RoundedRectangle(cornerRadius: 0)
             )
+            .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: -4)
         }
     }
 
