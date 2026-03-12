@@ -60,6 +60,10 @@ struct ContentView: View {
                 LiveQueueView(controller: controller)
             case .departmentProgress:
                 DepartmentProgressView(controller: controller)
+            case .hospitalNavigation:
+                HospitalNavigationView(controller: controller)
+            case .helpSupport:
+                HelpSupportView(controller: controller)
             }
         }
     }

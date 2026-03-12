@@ -700,14 +700,14 @@ struct DashboardView: View {
                         icon: "map.fill",
                         title: "Hospital\nNavigation",
                         color: Color(red: 147 / 255, green: 112 / 255, blue: 219 / 255),
-                        action: {}
+                        action: { controller.showHospitalNavigation() }
                     )
 
                     quickActionCard(
                         icon: "questionmark.circle.fill",
                         title: "Help &\nSupport",
                         color: Color(red: 121 / 255, green: 195 / 255, blue: 160 / 255),
-                        action: {}
+                        action: { controller.showHelpSupport() }
                     )
                 }
             }

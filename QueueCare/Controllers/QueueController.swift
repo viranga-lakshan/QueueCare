@@ -30,6 +30,8 @@ final class QueueController: ObservableObject {
         case profileSetup
         case liveQueue
         case departmentProgress
+        case hospitalNavigation
+        case helpSupport
     }
 
     @Published private(set) var currentScreen: Screen = .welcome
@@ -334,6 +336,14 @@ final class QueueController: ObservableObject {
     func showQueueStatus() {
         selectedDashboardTab = .progress
         currentScreen = .departmentProgress
+    }
+
+    func showHospitalNavigation() {
+        currentScreen = .hospitalNavigation
+    }
+
+    func showHelpSupport() {
+        currentScreen = .helpSupport
     }
 
     func selectChild(named name: String) {
