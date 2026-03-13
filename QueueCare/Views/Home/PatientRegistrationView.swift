@@ -3,7 +3,7 @@ import SwiftUI
 struct PatientRegistrationView: View {
     @ObservedObject var controller: QueueController
     @ObservedObject var phoneAuthController: PhoneAuthController
-    @State private var phoneNumber = ""
+    @State private var phoneNumberDigits = ""
     @State private var acceptedTerms = false
 
     private let brandColor = Color(red: 7 / 255, green: 169 / 255, blue: 150 / 255)
@@ -47,9 +47,29 @@ struct PatientRegistrationView: View {
                                 .font(.system(size: 16, weight: .medium))
                                 .frame(width: 18)
 
-                            TextField("+94771234567", text: $phoneNumber)
-                                .keyboardType(.phonePad)
+                            Text(phoneAuthController.countryCode)
+                                .font(.body)
+                                .foregroundStyle(.secondary)
+
+                            TextField("771234567", text: $phoneNumberDigits)
+                                .keyboardType(.numberPad)
                                 .textInputAutocapitalization(.never)
+                                .onChange(of: phoneNumberDigits) { _, newValue in
+                                    var digits = newValue.filter(\.isNumber)
+
+                                    if digits.hasPrefix("94"), digits.count >= 11 {
+                                        digits = String(digits.dropFirst(2))
+                                    }
+
+                                    if digits.hasPrefix("0"), digits.count == 10 {
+                                        digits = String(digits.dropFirst())
+                                    }
+
+                                    let limited = String(digits.prefix(9))
+                                    if limited != newValue {
+                                        phoneNumberDigits = limited
+                                    }
+                                }
                         }
                         .padding(.bottom, 10)
                         .overlay(alignment: .bottom) {
@@ -59,7 +79,7 @@ struct PatientRegistrationView: View {
                         }
                     }
 
-                    Text("Use +94771234567 or 0771234567")
+                    Text("Enter 9 digits after \(phoneAuthController.countryCode) (e.g. 771234567)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
@@ -85,7 +105,7 @@ struct PatientRegistrationView: View {
 
                     Button {
                         Task {
-                            await controller.requestOTP(for: phoneNumber)
+                            await controller.requestOTP(for: phoneAuthController.countryCode + phoneNumberDigits)
                         }
                     } label: {
                         Group {
@@ -116,13 +136,13 @@ struct PatientRegistrationView: View {
 
             RegistrationWaveFooter(color: brandColor)
         }
-        .onChange(of: phoneNumber) { _, _ in
+        .onChange(of: phoneNumberDigits) { _, _ in
             phoneAuthController.clearError()
         }
     }
 
     private var canRegister: Bool {
-        !phoneNumber.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && acceptedTerms
+        phoneNumberDigits.count == 9 && acceptedTerms
     }
 
     private var topBar: some View {

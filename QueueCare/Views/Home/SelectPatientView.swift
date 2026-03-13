@@ -160,7 +160,7 @@ private struct AddPatientSheet: View {
     @State private var name = ""
     @State private var ageText = ""
     @State private var relation = ""
-    @State private var contactNumber = ""
+    @State private var contactNumberDigits = ""
     @State private var email = ""
     @State private var gender = "Male"
     @State private var selectedPhoto: UIImage?
@@ -174,6 +174,8 @@ private struct AddPatientSheet: View {
     private let mutedTextColor = Color(red: 0.44, green: 0.47, blue: 0.5)
     private let iconBlue = Color(red: 45 / 255, green: 81 / 255, blue: 145 / 255)
     private let cardBlue = Color(red: 204 / 255, green: 230 / 255, blue: 240 / 255)
+
+    private let countryCode = PhoneAuthController.defaultCountryCode
 
     var body: some View {
         NavigationStack {
@@ -226,7 +228,7 @@ private struct AddPatientSheet: View {
                         formField(label: "Patient Name", placeholder: "Enter full name", text: $name, keyboard: .default)
                         formField(label: "Age", placeholder: "Enter age", text: $ageText, keyboard: .numberPad)
                         formField(label: "Relationship", placeholder: "e.g. Mother, Brother, Friend", text: $relation, keyboard: .default)
-                        formField(label: "Contact Number", placeholder: "Enter phone number", text: $contactNumber, keyboard: .phonePad)
+                        phoneField(label: "Contact Number")
                         formField(label: "Email", placeholder: "Enter email address", text: $email, keyboard: .emailAddress)
 
                         // Gender picker
@@ -265,7 +267,7 @@ private struct AddPatientSheet: View {
                             name: trimmedName,
                             age: Int(ageText) ?? 0,
                             relation: relation.trimmingCharacters(in: .whitespaces).isEmpty ? "Self" : relation.trimmingCharacters(in: .whitespaces),
-                            contactNumber: contactNumber.trimmingCharacters(in: .whitespaces),
+                            contactNumber: formattedContactNumber,
                             gender: gender,
                             email: email.trimmingCharacters(in: .whitespaces),
                             photo: selectedPhoto
@@ -319,6 +321,57 @@ private struct AddPatientSheet: View {
                         .fill(backgroundColor)
                 )
         }
+    }
+
+    private func phoneField(label: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label)
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(mutedTextColor)
+
+            HStack(spacing: 10) {
+                Text(countryCode)
+                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+
+                TextField("771234567", text: $contactNumberDigits)
+                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .keyboardType(.numberPad)
+                    .autocorrectionDisabled()
+                    .onChange(of: contactNumberDigits) { _, newValue in
+                        let normalized = normalizeSriLankaLocalDigits(newValue)
+                        if normalized != newValue {
+                            contactNumberDigits = normalized
+                        }
+                    }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 14)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(backgroundColor)
+            )
+        }
+    }
+
+    private var formattedContactNumber: String {
+        let trimmed = contactNumberDigits.trimmingCharacters(in: .whitespaces)
+        guard trimmed.count == 9 else { return "" }
+        return countryCode + trimmed
+    }
+
+    private func normalizeSriLankaLocalDigits(_ raw: String) -> String {
+        var digits = raw.filter(\.isNumber)
+
+        if digits.hasPrefix("94"), digits.count >= 11 {
+            digits = String(digits.dropFirst(2))
+        }
+
+        if digits.hasPrefix("0"), digits.count == 10 {
+            digits = String(digits.dropFirst())
+        }
+
+        return String(digits.prefix(9))
     }
 }
 

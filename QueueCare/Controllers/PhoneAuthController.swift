@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 final class PhoneAuthController: ObservableObject {
-    private static let defaultCountryCode = "+94"
+    static let defaultCountryCode = "+94"
     private static let hardcodedOTP = "123456" // Hardcoded OTP for testing
 
     let otpDigits = 6
@@ -13,6 +13,10 @@ final class PhoneAuthController: ObservableObject {
     @Published private(set) var currentPhoneNumber = ""
     @Published private(set) var lastVerifiedCode = ""
     @Published var errorMessage: String?
+
+    var countryCode: String {
+        Self.defaultCountryCode
+    }
 
     func clearError() {
         errorMessage = nil
@@ -100,7 +104,7 @@ final class PhoneAuthController: ObservableObject {
     }
 
     private func isValid(phoneNumber: String) -> Bool {
-        let pattern = "^\\+[1-9][0-9]{7,14}$"
+        let pattern = "^\\+94[0-9]{9}$"
         return phoneNumber.range(of: pattern, options: .regularExpression) != nil
     }
 }
@@ -112,7 +116,7 @@ private enum PhoneAuthError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidPhoneNumber:
-            return "Enter a valid phone number in international format, for example +94771234567."
+            return "Enter a valid Sri Lankan mobile number, for example +94771234567."
         case .invalidOTP:
             return "Enter the 6-digit code from the SMS."
         }

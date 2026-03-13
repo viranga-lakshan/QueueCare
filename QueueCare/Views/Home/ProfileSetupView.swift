@@ -5,13 +5,15 @@ struct ProfileSetupView: View {
     @ObservedObject var controller: QueueController
 
     @State private var name = ""
-    @State private var contactNumber = ""
+    @State private var contactNumberDigits = ""
     @State private var email = ""
     @State private var gender = "Male"
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var profileImage: UIImage?
     @State private var nameError = false
     @State private var contactError = false
+
+    private let countryCode = PhoneAuthController.defaultCountryCode
 
     private let brandColor = Color(red: 7 / 255, green: 169 / 255, blue: 150 / 255)
     private let backgroundColor = Color(red: 0.92, green: 0.95, blue: 0.95)
@@ -144,13 +146,7 @@ struct ProfileSetupView: View {
 
             divider
 
-            formField(
-                icon: "phone.fill",
-                placeholder: "Contact number",
-                text: $contactNumber,
-                keyboard: .phonePad,
-                hasError: contactError
-            )
+            phoneField(hasError: contactError)
 
             divider
 
@@ -190,6 +186,41 @@ struct ProfileSetupView: View {
                 .keyboardType(keyboard)
                 .autocorrectionDisabled()
                 .font(.system(size: 15))
+
+            if hasError {
+                Image(systemName: "exclamationmark.circle.fill")
+                    .foregroundStyle(.red)
+                    .font(.system(size: 14))
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 15)
+    }
+
+    private func phoneField(hasError: Bool) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "phone.fill")
+                .font(.system(size: 15))
+                .foregroundStyle(hasError ? .red : brandColor)
+                .frame(width: 22)
+
+            Text(countryCode)
+                .font(.system(size: 15))
+                .foregroundStyle(.secondary)
+
+            TextField("771234567", text: $contactNumberDigits)
+                .keyboardType(.numberPad)
+                .autocorrectionDisabled()
+                .font(.system(size: 15))
+                .onChange(of: contactNumberDigits) { _, newValue in
+                    let normalized = normalizeSriLankaLocalDigits(newValue)
+                    if normalized != newValue {
+                        contactNumberDigits = normalized
+                    }
+                    if contactError {
+                        contactError = false
+                    }
+                }
 
             if hasError {
                 Image(systemName: "exclamationmark.circle.fill")
@@ -267,14 +298,14 @@ struct ProfileSetupView: View {
 
     private func submit() {
         nameError = name.trimmingCharacters(in: .whitespaces).isEmpty
-        contactError = contactNumber.trimmingCharacters(in: .whitespaces).isEmpty
+        contactError = contactNumberDigits.count != 9
 
         guard !nameError, !contactError else { return }
 
         controller.saveUserProfile(
             UserProfile(
                 name: name.trimmingCharacters(in: .whitespaces),
-                contactNumber: contactNumber.trimmingCharacters(in: .whitespaces),
+                contactNumber: countryCode + contactNumberDigits,
                 email: email.trimmingCharacters(in: .whitespaces),
                 gender: gender,
                 photo: profileImage
@@ -286,11 +317,25 @@ struct ProfileSetupView: View {
         let profile = controller.userProfile
         if !profile.name.isEmpty {
             name = profile.name
-            contactNumber = profile.contactNumber
+            contactNumberDigits = normalizeSriLankaLocalDigits(profile.contactNumber)
             email = profile.email
             gender = profile.gender
             profileImage = profile.photo
         }
+    }
+
+    private func normalizeSriLankaLocalDigits(_ raw: String) -> String {
+        var digits = raw.filter(\.isNumber)
+
+        if digits.hasPrefix("94"), digits.count >= 11 {
+            digits = String(digits.dropFirst(2))
+        }
+
+        if digits.hasPrefix("0"), digits.count == 10 {
+            digits = String(digits.dropFirst())
+        }
+
+        return String(digits.prefix(9))
     }
 }
 
