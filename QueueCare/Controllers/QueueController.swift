@@ -24,7 +24,6 @@ final class QueueController: ObservableObject {
         case appointmentPayment
         case appointmentSuccess
         case pharmacyStatus
-        case medicineCollectionQueue
         case medicinesReadyProgress
         case noActiveQueue
         case collectionCompleted
@@ -35,6 +34,7 @@ final class QueueController: ObservableObject {
         case departmentProgress
         case hospitalNavigation
         case helpSupport
+        case medicalRecords
     }
 
     @Published private(set) var currentScreen: Screen = .welcome
@@ -308,12 +308,10 @@ final class QueueController: ObservableObject {
         currentScreen = .payment
     }
 
-    func showMedicineCollectionQueue() {
-        selectedDashboardTab = .progress
-        hasActiveQueue = true
+    func completePharmacyPaymentAndShowDashboard() {
         // Update Pharmacy progress to In Queue
         pharmacyProgressEntry = PharmacyProgressEntry(status: .inQueue)
-        currentScreen = .medicineCollectionQueue
+        showDashboard()
     }
 
     func completeMedicineQueueAndShowDashboard() {
@@ -331,8 +329,10 @@ final class QueueController: ObservableObject {
     func selectDashboardTab(_ tab: DashboardTab) {
         selectedDashboardTab = tab
         switch tab {
-        case .home, .queue, .user:
+        case .home, .user:
             currentScreen = .dashboard
+        case .map:
+            showHospitalNavigation()
         case .progress:
             showQueueStatus()
         }
@@ -359,11 +359,17 @@ final class QueueController: ObservableObject {
     }
 
     func showHospitalNavigation() {
+        selectedDashboardTab = .map
         currentScreen = .hospitalNavigation
     }
 
     func showHelpSupport() {
         currentScreen = .helpSupport
+    }
+
+    func showMedicalRecords() {
+        selectedDashboardTab = .home
+        currentScreen = .medicalRecords
     }
 
     func selectChild(named name: String) {

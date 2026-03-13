@@ -520,7 +520,7 @@ struct DashboardView: View {
             // Actions
             HStack(spacing: 12) {
                 Button {
-                    controller.selectDashboardTab(.queue)
+                    controller.selectDashboardTab(.progress)
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "list.bullet.rectangle.fill")
@@ -692,7 +692,7 @@ struct DashboardView: View {
                         icon: "doc.text.fill",
                         title: "Medical\nRecords",
                         color: Color(red: 240 / 255, green: 149 / 255, blue: 107 / 255),
-                        action: {}
+                        action: { controller.showMedicalRecords() }
                     )
                 }
 

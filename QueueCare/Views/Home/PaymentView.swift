@@ -11,6 +11,7 @@ struct PaymentView: View {
     private let amountCardColor = Color(red: 163 / 255, green: 210 / 255, blue: 177 / 255)
 
     @State private var selectedMethod: PaymentMethod = .card
+    @State private var showPaymentSuccess = false
 
     enum PaymentMethod {
         case card
@@ -62,7 +63,7 @@ struct PaymentView: View {
                     .padding(.top, 26)
 
                     Button {
-                        controller.showMedicineCollectionQueue()
+                        showPaymentSuccess = true
                     } label: {
                         HStack(spacing: 12) {
                             Text("Confirm Payment")
@@ -86,6 +87,16 @@ struct PaymentView: View {
                 }
                 .padding(.horizontal, 30)
             }
+        }
+        .sheet(isPresented: $showPaymentSuccess) {
+            PaymentSuccessModal(
+                brandColor: brandColor,
+                textColor: textColor,
+                mutedTextColor: mutedTextColor
+            ) {
+                controller.completePharmacyPaymentAndShowDashboard()
+            }
+            .presentationDetents([.medium])
         }
         .safeAreaInset(edge: .bottom) {
             AppBottomNavigationBar(selectedTab: controller.selectedDashboardTab, accentColor: brandColor) { tab in
@@ -209,6 +220,71 @@ struct PaymentView: View {
             )
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct PaymentSuccessModal: View {
+    @Environment(\.dismiss) private var dismiss
+
+    let brandColor: Color
+    let textColor: Color
+    let mutedTextColor: Color
+    let onOkay: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color(red: 0.92, green: 0.95, blue: 0.95)
+                .ignoresSafeArea()
+
+            VStack(spacing: 18) {
+                ZStack {
+                    Circle()
+                        .fill(brandColor.opacity(0.15))
+                        .frame(width: 96, height: 96)
+
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 54, weight: .bold))
+                        .foregroundStyle(brandColor)
+                }
+
+                VStack(spacing: 8) {
+                    Text("Payment Successful")
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .foregroundStyle(textColor)
+
+                    Text("Your payment has been confirmed.")
+                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                        .foregroundStyle(mutedTextColor)
+                        .multilineTextAlignment(.center)
+                }
+
+                Button {
+                    dismiss()
+                    onOkay()
+                } label: {
+                    Text("Okay")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(brandColor)
+                                .shadow(color: brandColor.opacity(0.24), radius: 10, x: 0, y: 6)
+                        )
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 6)
+            }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 26)
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(.white)
+                    .shadow(color: .black.opacity(0.08), radius: 16, x: 0, y: 8)
+            )
+            .padding(.horizontal, 18)
+        }
     }
 }
 

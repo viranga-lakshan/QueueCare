@@ -48,8 +48,6 @@ struct ContentView: View {
                 AppointmentSuccessView(controller: controller)
             case .pharmacyStatus:
                 PharmacyStatusView(controller: controller, pharmacyController: controller.pharmacyController)
-            case .medicineCollectionQueue:
-                MedicineCollectionQueueView(controller: controller)
             case .medicinesReadyProgress:
                 MedicinesReadyProgressView(controller: controller)
             case .noActiveQueue:
@@ -70,6 +68,8 @@ struct ContentView: View {
                 HospitalNavigationView(controller: controller)
             case .helpSupport:
                 HelpSupportView(controller: controller)
+            case .medicalRecords:
+                MedicalRecordsView(controller: controller)
             }
         }
     }
