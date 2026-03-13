@@ -46,7 +46,7 @@ struct LaboratoryConfirmationView: View {
                         .padding(.horizontal, 22)
                         .padding(.top, 20)
 
-                    Button(action: {}) {
+                    Button(action: controller.showDashboard) {
                         Text(confirmation.buttonTitle)
                             .font(.system(size: 18, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)

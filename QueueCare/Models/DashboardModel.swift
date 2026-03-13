@@ -10,7 +10,7 @@ struct DashboardModel {
     let updates: [DashboardUpdate]
 
     static let sample = DashboardModel(
-        patientName: "Viranga",
+        patientName: "User",
         avatarImageName: "PHOTO-2026-03-10-12-35-46",
         children: [],
         shortcuts: [
